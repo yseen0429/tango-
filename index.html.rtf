@@ -1,0 +1,2189 @@
+{\rtf1\ansi\ansicpg932\cocoartf2870
+\cocoatextscaling0\cocoaplatform0{\fonttbl\f0\fswiss\fcharset0 Helvetica;}
+{\colortbl;\red255\green255\blue255;}
+{\*\expandedcolortbl;;}
+\paperw11900\paperh16840\margl1440\margr1440\vieww11520\viewh8400\viewkind0
+\pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\pardirnatural\partightenfactor0
+
+\f0\fs24 \cf0 <!DOCTYPE html>\
+<html lang="ja">\
+<head>\
+  <meta charset="UTF-8" />\
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />\
+  <title>FlashSRS - \uc0\u20998 \u25955 \u23398 \u32722 \u12501 \u12521 \u12483 \u12471 \u12517 \u12459 \u12540 \u12489 </title>\
+  <!-- Tailwind CSS CDN -->\
+  <script src="https://cdn.tailwindcss.com"></script>\
+  <!-- Font Awesome Icons -->\
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />\
+  <!-- Google Fonts: Inter & Noto Sans JP -->\
+  <link rel="preconnect" href="https://fonts.googleapis.com">\
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>\
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Noto+Sans+JP:wght@400;500;600;700;800&display=swap" rel="stylesheet">\
+  \
+  <script>\
+    tailwind.config = \{\
+      darkMode: 'class',\
+      theme: \{\
+        extend: \{\
+          fontFamily: \{\
+            sans: ['Inter', 'Noto Sans JP', 'sans-serif'],\
+          \},\
+          colors: \{\
+            brand: \{\
+              50: '#f0fdfa',\
+              100: '#ccfbf1',\
+              400: '#2dd4bf',\
+              500: '#14b8a6',\
+              600: '#0d9488',\
+              700: '#0f766e',\
+            \}\
+          \}\
+        \}\
+      \}\
+    \}\
+  </script>\
+\
+  <style>\
+    /* Mobile Touch Optimization & Safe Area */\
+    * \{\
+      -webkit-tap-highlight-color: transparent;\
+      touch-action: manipulation;\
+    \}\
+\
+    body \{\
+      padding-top: env(safe-area-inset-top, 0px);\
+      padding-bottom: calc(env(safe-area-inset-bottom, 0px) + 68px);\
+    \}\
+\
+    .safe-bottom \{\
+      padding-bottom: env(safe-area-inset-bottom, 8px);\
+    \}\
+\
+    /* 3D Flashcard Flip */\
+    .perspective-1000 \{\
+      perspective: 1000px;\
+    \}\
+    .card-inner \{\
+      transition: transform 0.35s cubic-bezier(0.2, 0.8, 0.2, 1);\
+      transform-style: preserve-3d;\
+    \}\
+    .card-flipped \{\
+      transform: rotateY(180deg);\
+    \}\
+    .card-front, .card-back \{\
+      backface-visibility: hidden;\
+      -webkit-backface-visibility: hidden;\
+    \}\
+    .card-back \{\
+      transform: rotateY(180deg);\
+    \}\
+\
+    /* Custom Scrollbar */\
+    ::-webkit-scrollbar \{\
+      width: 4px;\
+      height: 4px;\
+    \}\
+    ::-webkit-scrollbar-thumb \{\
+      background: #cbd5e1;\
+      border-radius: 9999px;\
+    \}\
+    .dark ::-webkit-scrollbar-thumb \{\
+      background: #475569;\
+    \}\
+\
+    /* Bottomsheet / Modal Transitions */\
+    .bottom-sheet \{\
+      transition: transform 0.22s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.2s ease;\
+    \}\
+    .bottom-sheet-hidden \{\
+      transform: translateY(100%);\
+      opacity: 0;\
+      pointer-events: none;\
+    \}\
+    .bottom-sheet-visible \{\
+      transform: translateY(0);\
+      opacity: 1;\
+      pointer-events: auto;\
+    \}\
+  </style>\
+</head>\
+<body class="bg-slate-100 dark:bg-slate-950 text-slate-800 dark:text-slate-100 min-h-screen flex flex-col font-sans select-none antialiased">\
+\
+  <header class="bg-white/95 dark:bg-slate-900/95 backdrop-blur-md border-b border-slate-200/80 dark:border-slate-800 sticky top-0 z-30 px-4 py-2.5">\
+    <div class="max-w-2xl mx-auto flex items-center justify-between">\
+      <!-- Brand Logo -->\
+      <div class="flex items-center space-x-2.5 cursor-pointer" onclick="switchView('decks')">\
+        <div class="w-8 h-8 rounded-xl bg-gradient-to-tr from-teal-600 to-emerald-400 flex items-center justify-center text-white shadow-sm">\
+          <i class="fa-solid fa-brain text-sm"></i>\
+        </div>\
+        <div>\
+          <span class="text-base font-extrabold tracking-tight bg-gradient-to-r from-teal-600 to-emerald-500 bg-clip-text text-transparent">FlashSRS</span>\
+        </div>\
+      </div>\
+\
+      <!-- Quick Action Buttons -->\
+      <div class="flex items-center space-x-2">\
+        <button onclick="toggleDarkMode()" class="w-8 h-8 rounded-xl flex items-center justify-center bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 active:scale-95 transition">\
+          <i id="theme-icon" class="fa-solid fa-moon text-xs"></i>\
+        </button>\
+        <button onclick="openCardModal()" class="flex items-center space-x-1.5 bg-teal-600 active:bg-teal-700 text-white text-xs font-bold px-3 py-1.5 rounded-xl shadow-sm active:scale-95 transition">\
+          <i class="fa-solid fa-plus text-[10px]"></i>\
+          <span>\uc0\u21336 \u35486 \u36861 \u21152 </span>\
+        </button>\
+      </div>\
+    </div>\
+  </header>\
+\
+  <main class="flex-1 max-w-2xl w-full mx-auto p-3 sm:p-4">\
+\
+    <!-- 1. DECKS VIEW (Initial Screen) -->\
+    <section id="view-decks" class="view-section space-y-3">\
+      <div class="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200/80 dark:border-slate-800 p-4 shadow-sm">\
+        <div class="flex items-center justify-between mb-3">\
+          <div>\
+            <h2 class="text-base font-bold text-slate-800 dark:text-white flex items-center space-x-1.5">\
+              <i class="fa-solid fa-folder-tree text-teal-500 text-sm"></i>\
+              <span>\uc0\u12487 \u12483 \u12461 \u19968 \u35239 </span>\
+            </h2>\
+            <p class="text-[11px] text-slate-400 mt-0.5">\uc0\u12487 \u12483 \u12461 \u12434 \u12479 \u12483 \u12503 \u12375 \u12390 \u21336 \u35486 \u23398 \u32722 \u12434 \u38283 \u22987 </p>\
+          </div>\
+          <div class="flex items-center space-x-1.5">\
+            <button onclick="openImportModal('__from_csv__')" class="bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 text-slate-700 dark:text-slate-300 text-xs font-bold px-2.5 py-1.5 rounded-xl transition flex items-center space-x-1 active:scale-95">\
+              <i class="fa-solid fa-file-import text-teal-500 text-xs"></i>\
+              <span>CSV\uc0\u35501 \u36796 </span>\
+            </button>\
+            <button onclick="openDeckModal()" class="bg-teal-600 active:bg-teal-700 text-white text-xs font-bold px-3 py-1.5 rounded-xl shadow-sm flex items-center space-x-1 active:scale-95">\
+              <i class="fa-solid fa-folder-plus text-xs"></i>\
+              <span>\uc0\u26032 \u35215 \u12487 \u12483 \u12461 </span>\
+            </button>\
+          </div>\
+        </div>\
+\
+        <!-- Hierarchical Tree -->\
+        <div id="deck-tree-container" class="divide-y divide-slate-100 dark:divide-slate-800/80">\
+          <!-- Dynamically populated -->\
+        </div>\
+      </div>\
+    </section>\
+\
+    <!-- 2. STUDY VIEW -->\
+    <section id="view-study" class="view-section hidden">\
+      <!-- Deck Filter & Daily Limit Banner -->\
+      <div class="bg-white dark:bg-slate-900 p-3 rounded-2xl border border-slate-200/80 dark:border-slate-800 shadow-sm mb-3">\
+        <div class="flex items-center justify-between gap-2 mb-2">\
+          <div class="flex items-center space-x-1.5 flex-1 min-w-0">\
+            <i class="fa-solid fa-folder-open text-teal-500 text-xs flex-shrink-0"></i>\
+            <select id="study-deck-filter" onchange="changeStudyDeck(this.value)" class="w-full text-xs font-bold bg-slate-100 dark:bg-slate-800 text-slate-800 dark:text-slate-100 rounded-lg px-2.5 py-1.5 border-none truncate focus:ring-1 focus:ring-teal-500">\
+              <option value="all">\uc0\u12377 \u12409 \u12390 \u12398 \u12487 \u12483 \u12461 \u65288 \u20840 \u20307 \u23398 \u32722 \u65289 </option>\
+            </select>\
+          </div>\
+          <button onclick="resetSession()" title="\uc0\u20877 \u35501 \u12415 \u36796 \u12415 " class="p-1.5 text-slate-400 hover:text-teal-600 text-xs rounded-lg active:scale-90">\
+            <i class="fa-solid fa-arrows-rotate"></i>\
+          </button>\
+        </div>\
+\
+        <!-- SRS Status Counts -->\
+        <div class="grid grid-cols-3 gap-1.5 text-center text-[11px] font-bold">\
+          <div class="bg-blue-50 dark:bg-blue-950/40 text-blue-600 dark:text-blue-400 py-1 px-2 rounded-lg flex flex-col">\
+            <span>\uc0\u26032 \u35215 \u12459 \u12540 \u12489 </span>\
+            <span class="text-xs mt-0.5"><span id="queue-new-count">0</span> / <span id="limit-new-text" class="text-[10px] font-normal opacity-80">20</span></span>\
+          </div>\
+          <div class="bg-amber-50 dark:bg-amber-950/40 text-amber-600 dark:text-amber-400 py-1 px-2 rounded-lg flex flex-col">\
+            <span>\uc0\u23450 \u30528 \u20013 </span>\
+            <span id="queue-learn-count" class="text-xs mt-0.5">0</span>\
+          </div>\
+          <div class="bg-emerald-50 dark:bg-emerald-950/40 text-emerald-600 dark:text-emerald-400 py-1 px-2 rounded-lg flex flex-col">\
+            <span>\uc0\u24489 \u32722 \u24453 \u12385 </span>\
+            <span class="text-xs mt-0.5"><span id="queue-due-count">0</span> / <span id="limit-due-text" class="text-[10px] font-normal opacity-80">50</span></span>\
+          </div>\
+        </div>\
+      </div>\
+\
+      <!-- Card Stage Container -->\
+      <div id="study-stage" class="flex flex-col">\
+        <!-- Progress Bar -->\
+        <div class="mb-2 flex items-center justify-between text-[11px] text-slate-400 font-medium px-1">\
+          <span id="session-progress-text">\uc0\u27531 \u12426  0 \u26522 </span>\
+          <span class="text-[10px] text-teal-600 dark:text-teal-400 font-semibold flex items-center space-x-1">\
+            <i class="fa-solid fa-hand-pointer text-[10px]"></i>\
+            <span>\uc0\u12479 \u12483 \u12503 \u12391 \u21453 \u36578 </span>\
+          </span>\
+        </div>\
+        <div class="w-full bg-slate-200 dark:bg-slate-800 h-1.5 rounded-full overflow-hidden mb-3">\
+          <div id="session-progress-bar" class="bg-gradient-to-r from-teal-500 to-emerald-400 h-full w-0 transition-all duration-300"></div>\
+        </div>\
+\
+        <!-- 3D Flashcard optimized for mobile height -->\
+        <div class="w-full h-[52vh] min-h-[300px] max-h-[450px] perspective-1000 cursor-pointer" onclick="flipCard()">\
+          <div id="flashcard-inner" class="card-inner relative w-full h-full rounded-3xl shadow-md border border-slate-200/90 dark:border-slate-800 bg-white dark:bg-slate-900 transition-all duration-300">\
+            \
+            <!-- FRONT SIDE -->\
+            <div class="card-front absolute inset-0 w-full h-full p-5 flex flex-col justify-between rounded-3xl bg-white dark:bg-slate-900">\
+              <div class="flex items-center justify-between">\
+                <span id="card-front-tag" class="px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-teal-50 dark:bg-teal-950/60 text-teal-600 dark:text-teal-400 border border-teal-100 dark:border-teal-900 truncate max-w-[200px]">\
+                  \uc0\u19968 \u33324 \
+                </span>\
+                <button onclick="event.stopPropagation(); speakCurrentWord();" class="w-9 h-9 rounded-full bg-slate-100 dark:bg-slate-800 active:bg-teal-100 dark:active:bg-teal-900 text-slate-600 dark:text-slate-300 text-sm flex items-center justify-center">\
+                  <i class="fa-solid fa-volume-high"></i>\
+                </button>\
+              </div>\
+\
+              <!-- Main Front Text -->\
+              <div class="text-center my-auto py-2">\
+                <h2 id="card-front-text" class="text-3xl sm:text-4xl font-extrabold text-slate-900 dark:text-white tracking-tight break-words">\
+                  Word\
+                </h2>\
+                <p id="card-front-phonetic" class="text-xs font-mono text-slate-400 mt-1">/w\uc0\u604 \u720 d/</p>\
+                <p id="card-front-hint" class="text-[11px] text-slate-400 dark:text-slate-500 mt-2 italic hidden"></p>\
+              </div>\
+\
+              <div class="text-center text-[11px] text-slate-400 flex items-center justify-center space-x-1 py-1">\
+                <i class="fa-solid fa-arrow-rotate-left text-[10px]"></i>\
+                <span>\uc0\u12479 \u12483 \u12503 \u12375 \u12390 \u31572 \u12360 \u12434 \u30906 \u35469 </span>\
+              </div>\
+            </div>\
+\
+            <!-- BACK SIDE -->\
+            <div class="card-back absolute inset-0 w-full h-full p-5 flex flex-col justify-between rounded-3xl bg-gradient-to-b from-slate-50 to-white dark:from-slate-900 dark:to-slate-850">\
+              <div class="flex items-center justify-between">\
+                <span id="card-back-tag" class="px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-indigo-50 dark:bg-indigo-950/60 text-indigo-600 dark:text-indigo-400 border border-indigo-100 dark:border-indigo-900 truncate max-w-[200px]">\
+                  \uc0\u26085 \u26412 \u35486 \u35379 \
+                </span>\
+                <div class="flex items-center space-x-2">\
+                  <span id="card-interval-badge" class="text-[10px] text-slate-400 font-mono">1\uc0\u26085 \u24460 </span>\
+                  <button onclick="event.stopPropagation(); speakCurrentWord();" class="w-8 h-8 rounded-full bg-slate-100 dark:bg-slate-800 active:bg-indigo-100 text-slate-600 dark:text-slate-300 text-xs flex items-center justify-center">\
+                    <i class="fa-solid fa-volume-high"></i>\
+                  </button>\
+                </div>\
+              </div>\
+\
+              <!-- Main Back Content -->\
+              <div class="text-center my-auto overflow-y-auto max-h-[36vh] px-1 py-1">\
+                <h3 id="card-back-text" class="text-2xl sm:text-3xl font-bold text-teal-600 dark:text-teal-400 mb-2 break-words">\
+                  \uc0\u24847 \u21619 \
+                </h3>\
+                <div id="card-example-box" class="bg-slate-100 dark:bg-slate-800/80 p-3 rounded-xl text-left text-xs text-slate-700 dark:text-slate-200 border-l-4 border-teal-500 my-2">\
+                  <p id="card-back-example" class="font-medium text-xs"></p>\
+                  <p id="card-back-example-tr" class="text-[11px] text-slate-400 mt-1"></p>\
+                </div>\
+                <p id="card-back-note" class="text-[11px] text-slate-500 dark:text-slate-400 mt-1.5 text-left"></p>\
+              </div>\
+\
+              <div class="text-center text-[10px] text-slate-400">\
+                \uc0\u19979 \u12398 \u12508 \u12479 \u12531 \u12391 \u35352 \u25014 \u24230 \u12434 \u36984 \u25246 \
+              </div>\
+            </div>\
+\
+          </div>\
+        </div>\
+\
+        <!-- SRS 4 Rating Buttons -->\
+        <div id="srs-action-bar" class="w-full mt-3 opacity-30 pointer-events-none transition-all duration-200">\
+          <div class="grid grid-cols-4 gap-1.5 sm:gap-2">\
+            <!-- 1: Again -->\
+            <button onclick="rateCard(1)" class="flex flex-col items-center justify-center py-2.5 px-1 rounded-2xl bg-red-50 active:bg-red-200 dark:bg-red-950/50 dark:active:bg-red-900 border border-red-200 dark:border-red-900/60 text-red-600 dark:text-red-400 active:scale-95 transition">\
+              <span class="text-xs font-bold leading-tight">\uc0\u12418 \u12358 \u19968 \u24230 </span>\
+              <span id="time-again" class="text-[9px] font-mono opacity-80 mt-0.5">&lt;10\uc0\u20998 </span>\
+            </button>\
+\
+            <!-- 2: Hard -->\
+            <button onclick="rateCard(2)" class="flex flex-col items-center justify-center py-2.5 px-1 rounded-2xl bg-amber-50 active:bg-amber-200 dark:bg-amber-950/50 dark:active:bg-amber-900 border border-amber-200 dark:border-amber-900/60 text-amber-600 dark:text-amber-400 active:scale-95 transition">\
+              <span class="text-xs font-bold leading-tight">\uc0\u38627 \u12375 \u12356 </span>\
+              <span id="time-hard" class="text-[9px] font-mono opacity-80 mt-0.5">1\uc0\u26085 </span>\
+            </button>\
+\
+            <!-- 3: Good -->\
+            <button onclick="rateCard(3)" class="flex flex-col items-center justify-center py-2.5 px-1 rounded-2xl bg-blue-50 active:bg-blue-200 dark:bg-blue-950/50 dark:active:bg-blue-900 border border-blue-200 dark:border-blue-900/60 text-blue-600 dark:text-blue-400 active:scale-95 transition">\
+              <span class="text-xs font-bold leading-tight">\uc0\u26222 \u36890 </span>\
+              <span id="time-good" class="text-[9px] font-mono opacity-80 mt-0.5">3\uc0\u26085 </span>\
+            </button>\
+\
+            <!-- 4: Easy -->\
+            <button onclick="rateCard(4)" class="flex flex-col items-center justify-center py-2.5 px-1 rounded-2xl bg-emerald-50 active:bg-emerald-200 dark:bg-emerald-950/50 dark:active:bg-emerald-900 border border-emerald-200 dark:border-emerald-900/60 text-emerald-600 dark:text-emerald-400 active:scale-95 transition">\
+              <span class="text-xs font-bold leading-tight">\uc0\u31777 \u21336 </span>\
+              <span id="time-easy" class="text-[9px] font-mono opacity-80 mt-0.5">7\uc0\u26085 </span>\
+            </button>\
+          </div>\
+        </div>\
+\
+      </div>\
+\
+      <!-- Completed Empty Screen -->\
+      <div id="study-empty-stage" class="text-center py-8 px-5 bg-white dark:bg-slate-900 rounded-3xl border border-slate-200/80 dark:border-slate-800 shadow-sm hidden my-4">\
+        <div class="w-14 h-14 mx-auto mb-3 rounded-2xl bg-teal-100 dark:bg-teal-950/60 flex items-center justify-center text-teal-600 dark:text-teal-400">\
+          <i class="fa-solid fa-circle-check text-2xl"></i>\
+        </div>\
+        <h3 id="study-complete-title" class="text-lg font-extrabold text-slate-800 dark:text-white mb-1">\uc0\u26412 \u26085 \u12398 \u23398 \u32722 \u12364 \u23436 \u20102 \u12375 \u12414 \u12375 \u12383 \u65281 </h3>\
+        <p id="study-complete-desc" class="text-xs text-slate-400 mb-4 max-w-xs mx-auto">\
+          \uc0\u35373 \u23450 \u12373 \u12428 \u12383 1\u26085 \u12398 \u23398 \u32722 \u19978 \u38480 \u12395 \u36948 \u12375 \u12383 \u12363 \u12289 \u26412 \u26085 \u24489 \u32722 \u12364 \u24517 \u35201 \u12394 \u12459 \u12540 \u12489 \u12364 \u23436 \u20102 \u12375 \u12414 \u12375 \u12383 \u12290 \
+        </p>\
+\
+        <!-- Today Summary Card -->\
+        <div class="bg-slate-50 dark:bg-slate-800/70 p-3 rounded-2xl mb-4 max-w-xs mx-auto text-left border border-slate-100 dark:border-slate-700/60">\
+          <h4 class="text-[11px] font-bold text-slate-600 dark:text-slate-300 mb-2 flex items-center justify-between">\
+            <span><i class="fa-solid fa-calendar-check mr-1.5 text-teal-500"></i>\uc0\u26412 \u26085 \u12398 \u23398 \u32722 \u23455 \u32318 </span>\
+            <span class="text-[10px] text-slate-400" id="today-date-label"></span>\
+          </h4>\
+          <div class="grid grid-cols-2 gap-2 text-center text-xs">\
+            <div class="bg-white dark:bg-slate-900 p-2 rounded-xl border border-slate-200/60 dark:border-slate-800">\
+              <div class="text-[10px] text-slate-400">\uc0\u26032 \u35215 \u23436 \u20102 </div>\
+              <div id="today-finished-new" class="text-sm font-black text-blue-600 dark:text-blue-400">0</div>\
+            </div>\
+            <div class="bg-white dark:bg-slate-900 p-2 rounded-xl border border-slate-200/60 dark:border-slate-800">\
+              <div class="text-[10px] text-slate-400">\uc0\u24489 \u32722 \u23436 \u20102 </div>\
+              <div id="today-finished-due" class="text-sm font-black text-emerald-600 dark:text-emerald-400">0</div>\
+            </div>\
+          </div>\
+        </div>\
+\
+        <div class="space-y-2 max-w-xs mx-auto">\
+          <button onclick="startCramMode()" class="w-full py-2.5 px-4 bg-teal-600 active:bg-teal-700 text-white font-bold rounded-xl text-xs shadow-sm active:scale-95 transition">\
+            <i class="fa-solid fa-bolt mr-1.5"></i>\uc0\u19978 \u38480 \u12434 \u28961 \u35222 \u12375 \u12390 \u20840 \u21336 \u35486 \u24489 \u32722 \
+          </button>\
+          <button onclick="switchView('settings')" class="w-full py-2.5 px-4 bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-200 font-semibold rounded-xl text-xs active:scale-95 transition">\
+            <i class="fa-solid fa-sliders mr-1.5"></i>\uc0\u23398 \u32722 \u19978 \u38480 \u25968 \u12434 \u22793 \u26356 \u12377 \u12427 \
+          </button>\
+        </div>\
+      </div>\
+    </section>\
+\
+    <!-- 3. CARDS VIEW -->\
+    <section id="view-cards" class="view-section hidden space-y-3">\
+      <!-- Search & Filters Header -->\
+      <div class="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200/80 dark:border-slate-800 p-3.5 shadow-sm space-y-2.5">\
+        <!-- Search bar -->\
+        <div class="relative">\
+          <i class="fa-solid fa-magnifying-glass absolute left-3 top-2.5 text-slate-400 text-xs"></i>\
+          <input type="text" id="card-search-input" oninput="renderCardsList()" placeholder="\uc0\u21336 \u35486 \u12539 \u24847 \u21619 \u12539 \u12487 \u12483 \u12461 \u12391 \u26908 \u32034 ..." class="w-full pl-8 pr-3 py-1.5 text-xs bg-slate-100 dark:bg-slate-800 text-slate-800 dark:text-slate-100 rounded-xl focus:ring-1 focus:ring-teal-500 focus:outline-none" />\
+        </div>\
+\
+        <!-- Deck & Status Filters -->\
+        <div class="grid grid-cols-2 gap-2">\
+          <select id="card-deck-filter" onchange="renderCardsList()" class="text-xs bg-slate-100 dark:bg-slate-800 text-slate-800 dark:text-slate-100 rounded-xl px-2.5 py-1.5 border-none truncate focus:ring-1 focus:ring-teal-500">\
+            <option value="all">\uc0\u12377 \u12409 \u12390 \u12398 \u12487 \u12483 \u12461 </option>\
+          </select>\
+          <select id="card-status-filter" onchange="renderCardsList()" class="text-xs bg-slate-100 dark:bg-slate-800 text-slate-800 dark:text-slate-100 rounded-xl px-2.5 py-1.5 border-none truncate focus:ring-1 focus:ring-teal-500">\
+            <option value="all">\uc0\u12377 \u12409 \u12390 \u12398 \u29366 \u24907 </option>\
+            <option value="due">\uc0\u35201 \u24489 \u32722 </option>\
+            <option value="new">\uc0\u26032 \u35215 </option>\
+            <option value="learning">\uc0\u23450 \u30528 \u20013 </option>\
+            <option value="mastered">\uc0\u32722 \u24471 \u28168 \u12415 </option>\
+          </select>\
+        </div>\
+\
+        <!-- Actions Bar -->\
+        <div class="flex items-center justify-between pt-1 border-t border-slate-100 dark:border-slate-800 text-xs">\
+          <div class="flex items-center space-x-1.5">\
+            <button onclick="openImportModal('__from_csv__')" class="bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 text-slate-700 dark:text-slate-300 text-[11px] font-semibold px-2.5 py-1 rounded-lg active:scale-95 transition flex items-center">\
+              <i class="fa-solid fa-file-import mr-1 text-teal-500"></i>CSV\uc0\u35501 \u36796 \
+            </button>\
+            <button onclick="downloadCSVTemplate()" class="bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 text-slate-700 dark:text-slate-300 text-[11px] font-semibold px-2.5 py-1 rounded-lg active:scale-95 transition">\
+              <i class="fa-solid fa-file-csv mr-1 text-teal-500"></i>\uc0\u38619 \u24418 \
+            </button>\
+          </div>\
+          <button onclick="exportCardsJSON()" class="text-slate-500 text-[11px] px-2 py-1 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800">\
+            <i class="fa-solid fa-download mr-1"></i>\uc0\u12496 \u12483 \u12463 \u12450 \u12483 \u12503 \
+          </button>\
+        </div>\
+      </div>\
+\
+      <!-- Mobile Cards List Container -->\
+      <div id="cards-list-container" class="space-y-2">\
+        <!-- Dynamically populated cards -->\
+      </div>\
+      <div id="cards-empty-notice" class="p-8 text-center text-slate-400 text-xs hidden">\
+        \uc0\u35442 \u24403 \u12377 \u12427 \u21336 \u35486 \u12459 \u12540 \u12489 \u12364 \u35211 \u12388 \u12363 \u12426 \u12414 \u12379 \u12435 \u12290 \
+      </div>\
+    </section>\
+\
+    <!-- 4. STATS VIEW -->\
+    <section id="view-stats" class="view-section hidden space-y-3">\
+      <div class="grid grid-cols-2 gap-2.5">\
+        <div class="bg-white dark:bg-slate-900 p-3.5 rounded-2xl border border-slate-200/80 dark:border-slate-800 shadow-sm flex items-center space-x-3">\
+          <div class="w-10 h-10 rounded-xl bg-teal-50 dark:bg-teal-950/60 text-teal-600 flex items-center justify-center text-base flex-shrink-0">\
+            <i class="fa-solid fa-layer-group"></i>\
+          </div>\
+          <div>\
+            <p class="text-[10px] text-slate-400 font-bold uppercase">\uc0\u32207 \u21336 \u35486 \u25968 </p>\
+            <h4 id="stat-total" class="text-lg font-black text-slate-800 dark:text-white">0</h4>\
+          </div>\
+        </div>\
+\
+        <div class="bg-white dark:bg-slate-900 p-3.5 rounded-2xl border border-slate-200/80 dark:border-slate-800 shadow-sm flex items-center space-x-3">\
+          <div class="w-10 h-10 rounded-xl bg-emerald-50 dark:bg-emerald-950/60 text-emerald-600 flex items-center justify-center text-base flex-shrink-0">\
+            <i class="fa-solid fa-award"></i>\
+          </div>\
+          <div>\
+            <p class="text-[10px] text-slate-400 font-bold uppercase">\uc0\u32722 \u24471 \u28168 \u12415 </p>\
+            <h4 id="stat-mastered" class="text-lg font-black text-emerald-600 dark:text-emerald-400">0</h4>\
+          </div>\
+        </div>\
+\
+        <div class="bg-white dark:bg-slate-900 p-3.5 rounded-2xl border border-slate-200/80 dark:border-slate-800 shadow-sm flex items-center space-x-3">\
+          <div class="w-10 h-10 rounded-xl bg-amber-50 dark:bg-amber-950/60 text-amber-600 flex items-center justify-center text-base flex-shrink-0">\
+            <i class="fa-solid fa-fire"></i>\
+          </div>\
+          <div>\
+            <p class="text-[10px] text-slate-400 font-bold uppercase">\uc0\u24489 \u32722 \u24453 \u12385 </p>\
+            <h4 id="stat-due" class="text-lg font-black text-amber-600 dark:text-amber-400">0</h4>\
+          </div>\
+        </div>\
+\
+        <div class="bg-white dark:bg-slate-900 p-3.5 rounded-2xl border border-slate-200/80 dark:border-slate-800 shadow-sm flex items-center space-x-3">\
+          <div class="w-10 h-10 rounded-xl bg-indigo-50 dark:bg-indigo-950/60 text-indigo-600 flex items-center justify-center text-base flex-shrink-0">\
+            <i class="fa-solid fa-retweet"></i>\
+          </div>\
+          <div>\
+            <p class="text-[10px] text-slate-400 font-bold uppercase">\uc0\u32207 \u24489 \u32722 \u22238 \u25968 </p>\
+            <h4 id="stat-reviews" class="text-lg font-black text-slate-800 dark:text-white">0</h4>\
+          </div>\
+        </div>\
+      </div>\
+\
+      <!-- Retention Breakdown -->\
+      <div class="bg-white dark:bg-slate-900 p-4 rounded-2xl border border-slate-200/80 dark:border-slate-800 shadow-sm">\
+        <h3 class="text-sm font-bold text-slate-800 dark:text-white mb-3">\uc0\u23450 \u30528 \u24230 \u12398 \u20869 \u35379 </h3>\
+        \
+        <div class="space-y-3">\
+          <div>\
+            <div class="flex justify-between text-xs font-semibold mb-1">\
+              <span class="text-blue-600 dark:text-blue-400 flex items-center"><i class="fa-solid fa-seedling mr-1"></i>\uc0\u26032 \u35215 </span>\
+              <span id="bar-new-pct" class="text-slate-400 text-[11px]">0%</span>\
+            </div>\
+            <div class="w-full bg-slate-100 dark:bg-slate-800 h-2 rounded-full overflow-hidden">\
+              <div id="bar-new" class="bg-blue-500 h-full rounded-full transition-all duration-300" style="width: 0%"></div>\
+            </div>\
+          </div>\
+\
+          <div>\
+            <div class="flex justify-between text-xs font-semibold mb-1">\
+              <span class="text-amber-600 dark:text-amber-400 flex items-center"><i class="fa-solid fa-arrows-rotate mr-1"></i>\uc0\u23450 \u30528 \u20013  (1\u12316 20\u26085 )</span>\
+              <span id="bar-learn-pct" class="text-slate-400 text-[11px]">0%</span>\
+            </div>\
+            <div class="w-full bg-slate-100 dark:bg-slate-800 h-2 rounded-full overflow-hidden">\
+              <div id="bar-learn" class="bg-amber-500 h-full rounded-full transition-all duration-300" style="width: 0%"></div>\
+            </div>\
+          </div>\
+\
+          <div>\
+            <div class="flex justify-between text-xs font-semibold mb-1">\
+              <span class="text-emerald-600 dark:text-emerald-400 flex items-center"><i class="fa-solid fa-circle-check mr-1"></i>\uc0\u32722 \u24471  (21\u26085 \u20197 \u19978 )</span>\
+              <span id="bar-master-pct" class="text-slate-400 text-[11px]">0%</span>\
+            </div>\
+            <div class="w-full bg-slate-100 dark:bg-slate-800 h-2 rounded-full overflow-hidden">\
+              <div id="bar-master" class="bg-emerald-500 h-full rounded-full transition-all duration-300" style="width: 0%"></div>\
+            </div>\
+          </div>\
+        </div>\
+      </div>\
+    </section>\
+\
+    <!-- 5. SETTINGS VIEW -->\
+    <section id="view-settings" class="view-section hidden space-y-3">\
+      <!-- 1-day study limits card -->\
+      <div class="bg-white dark:bg-slate-900 p-4 rounded-2xl border border-slate-200/80 dark:border-slate-800 shadow-sm space-y-4">\
+        <div class="flex items-center space-x-2 border-b border-slate-100 dark:border-slate-800 pb-2.5">\
+          <i class="fa-solid fa-sliders text-teal-500 text-sm"></i>\
+          <h3 class="text-sm font-bold text-slate-800 dark:text-white">1\uc0\u26085 \u12398 \u23398 \u32722 \u19978 \u38480 \u35373 \u23450 </h3>\
+        </div>\
+\
+        <!-- Daily New Cards Limit -->\
+        <div class="space-y-1.5">\
+          <div class="flex items-center justify-between">\
+            <label class="text-xs font-bold text-slate-700 dark:text-slate-200">1\uc0\u26085 \u12398 \u26032 \u35215 \u21336 \u35486 \u12459 \u12540 \u12489 \u19978 \u38480 </label>\
+            <span id="setting-new-limit-val" class="text-xs font-mono font-bold text-teal-600 dark:text-teal-400">20\uc0\u26522 </span>\
+          </div>\
+          <p class="text-[11px] text-slate-400 leading-tight">1\uc0\u26085 \u12395 \u26032 \u12375 \u12367 \u23398 \u32722 \u12377 \u12427 \u21336 \u35486 \u12398 \u19978 \u38480 \u26522 \u25968 \u12434 \u35373 \u23450 \u12375 \u12414 \u12377 \u12290 </p>\
+          <div class="grid grid-cols-5 gap-1 pt-1">\
+            <button type="button" onclick="setDailyNewLimit(20)" class="limit-btn-new py-1.5 px-1 rounded-xl text-[11px] font-semibold bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300" data-val="20">20\uc0\u26522 </button>\
+            <button type="button" onclick="setDailyNewLimit(50)" class="limit-btn-new py-1.5 px-1 rounded-xl text-[11px] font-semibold bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300" data-val="50">50\uc0\u26522 </button>\
+            <button type="button" onclick="setDailyNewLimit(100)" class="limit-btn-new py-1.5 px-1 rounded-xl text-[11px] font-semibold bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300" data-val="100">100\uc0\u26522 </button>\
+            <button type="button" onclick="setDailyNewLimit(200)" class="limit-btn-new py-1.5 px-1 rounded-xl text-[11px] font-semibold bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300" data-val="200">200\uc0\u26522 </button>\
+            <button type="button" onclick="setDailyNewLimit(9999)" class="limit-btn-new py-1.5 px-1 rounded-xl text-[11px] font-semibold bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300" data-val="9999">\uc0\u28961 \u21046 \u38480 </button>\
+          </div>\
+          <div class="flex items-center space-x-2 pt-1">\
+            <input type="number" id="custom-new-limit" min="1" max="1000" placeholder="\uc0\u12459 \u12473 \u12479 \u12512 \u25968 \u20516  (\u20363 : 30)" onchange="setDailyNewLimit(this.value)" class="w-full text-xs px-3 py-1.5 bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 rounded-xl focus:ring-1 focus:ring-teal-500" />\
+          </div>\
+        </div>\
+\
+        <div class="border-t border-slate-100 dark:border-slate-800 pt-3 space-y-1.5">\
+          <div class="flex items-center justify-between">\
+            <label class="text-xs font-bold text-slate-700 dark:text-slate-200">1\uc0\u26085 \u12398 \u26368 \u22823 \u24489 \u32722 \u12459 \u12540 \u12489 \u19978 \u38480 </label>\
+            <span id="setting-due-limit-val" class="text-xs font-mono font-bold text-teal-600 dark:text-teal-400">50\uc0\u26522 </span>\
+          </div>\
+          <p class="text-[11px] text-slate-400 leading-tight">1\uc0\u26085 \u12395 \u24489 \u32722 \u65288 \u36942 \u21435 \u12395 \u23398 \u12435 \u12384 \u21336 \u35486 \u65289 \u12377 \u12427 \u26368 \u22823 \u26522 \u25968 \u12434 \u35373 \u23450 \u12375 \u12414 \u12377 \u12290 </p>\
+          <div class="grid grid-cols-5 gap-1 pt-1">\
+            <button type="button" onclick="setDailyDueLimit(50)" class="limit-btn-due py-1.5 px-1 rounded-xl text-[11px] font-semibold bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300" data-val="50">50\uc0\u26522 </button>\
+            <button type="button" onclick="setDailyDueLimit(100)" class="limit-btn-due py-1.5 px-1 rounded-xl text-[11px] font-semibold bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300" data-val="100">100\uc0\u26522 </button>\
+            <button type="button" onclick="setDailyDueLimit(200)" class="limit-btn-due py-1.5 px-1 rounded-xl text-[11px] font-semibold bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300" data-val="200">200\uc0\u26522 </button>\
+            <button type="button" onclick="setDailyDueLimit(500)" class="limit-btn-due py-1.5 px-1 rounded-xl text-[11px] font-semibold bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300" data-val="500">500\uc0\u26522 </button>\
+            <button type="button" onclick="setDailyDueLimit(9999)" class="limit-btn-due py-1.5 px-1 rounded-xl text-[11px] font-semibold bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300" data-val="9999">\uc0\u28961 \u21046 \u38480 </button>\
+          </div>\
+          <div class="flex items-center space-x-2 pt-1">\
+            <input type="number" id="custom-due-limit" min="1" max="2000" placeholder="\uc0\u12459 \u12473 \u12479 \u12512 \u25968 \u20516  (\u20363 : 150)" onchange="setDailyDueLimit(this.value)" class="w-full text-xs px-3 py-1.5 bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 rounded-xl focus:ring-1 focus:ring-teal-500" />\
+          </div>\
+        </div>\
+      </div>\
+\
+      <!-- App Preference Options -->\
+      <div class="bg-white dark:bg-slate-900 p-4 rounded-2xl border border-slate-200/80 dark:border-slate-800 shadow-sm space-y-3">\
+        <div class="flex items-center space-x-2 border-b border-slate-100 dark:border-slate-800 pb-2.5">\
+          <i class="fa-solid fa-gear text-teal-500 text-sm"></i>\
+          <h3 class="text-sm font-bold text-slate-800 dark:text-white">\uc0\u23398 \u32722 \u12458 \u12503 \u12471 \u12519 \u12531 </h3>\
+        </div>\
+\
+        <div class="flex items-center justify-between py-1">\
+          <div>\
+            <div class="text-xs font-bold text-slate-800 dark:text-white">\uc0\u20986 \u38988 \u26178 \u12395 \u38899 \u22768 \u12434 \u33258 \u21205 \u20877 \u29983 </div>\
+            <div class="text-[11px] text-slate-400">\uc0\u12459 \u12540 \u12489 \u34920 \u31034 \u26178 \u12395 \u33258 \u21205 \u12391 \u33521 \u35486 \u30330 \u38899 \u12434 \u20877 \u29983 </div>\
+          </div>\
+          <label class="relative inline-flex items-center cursor-pointer">\
+            <input type="checkbox" id="setting-auto-speak" onchange="toggleAutoSpeak(this.checked)" class="sr-only peer">\
+            <div class="w-9 h-5 bg-slate-200 peer-focus:outline-none rounded-full peer dark:bg-slate-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-teal-600"></div>\
+          </label>\
+        </div>\
+      </div>\
+\
+      <!-- Data Operations -->\
+      <div class="bg-white dark:bg-slate-900 p-4 rounded-2xl border border-slate-200/80 dark:border-slate-800 shadow-sm space-y-2.5">\
+        <div class="flex items-center space-x-2 border-b border-slate-100 dark:border-slate-800 pb-2">\
+          <i class="fa-solid fa-database text-teal-500 text-sm"></i>\
+          <h3 class="text-sm font-bold text-slate-800 dark:text-white">\uc0\u12487 \u12540 \u12479 \u31649 \u29702 </h3>\
+        </div>\
+        <div class="flex flex-col space-y-2 pt-1 text-xs">\
+          <button onclick="loadDefaultPresets()" class="w-full py-2.5 px-3 bg-teal-50 dark:bg-teal-950/40 text-teal-700 dark:text-teal-300 font-semibold rounded-xl text-left flex items-center justify-between active:scale-98 transition">\
+            <span><i class="fa-solid fa-rotate-left mr-2"></i>\uc0\u12503 \u12522 \u12475 \u12483 \u12488 \u21336 \u35486 \u12434 \u12525 \u12540 \u12489 </span>\
+            <i class="fa-solid fa-chevron-right text-[10px]"></i>\
+          </button>\
+          <button onclick="resetTodayReviewCount()" class="w-full py-2.5 px-3 bg-amber-50 dark:bg-amber-950/40 text-amber-700 dark:text-amber-400 font-semibold rounded-xl text-left flex items-center justify-between active:scale-98 transition">\
+            <span><i class="fa-solid fa-clock-rotate-left mr-2"></i>\uc0\u26412 \u26085 \u12398 \u23398 \u32722 \u12459 \u12454 \u12531 \u12488 \u12434 \u12522 \u12475 \u12483 \u12488 </span>\
+            <i class="fa-solid fa-chevron-right text-[10px]"></i>\
+          </button>\
+          <button onclick="clearAllDataModal()" class="w-full py-2.5 px-3 bg-red-50 dark:bg-red-950/40 text-red-600 dark:text-red-400 font-semibold rounded-xl text-left flex items-center justify-between active:scale-98 transition">\
+            <span><i class="fa-solid fa-trash-can mr-2"></i>\uc0\u12377 \u12409 \u12390 \u12398 \u21336 \u35486 \u12487 \u12540 \u12479 \u12434 \u21021 \u26399 \u21270 </span>\
+            <i class="fa-solid fa-chevron-right text-[10px]"></i>\
+          </button>\
+        </div>\
+      </div>\
+    </section>\
+\
+  </main>\
+\
+  <nav class="fixed bottom-0 left-0 right-0 z-40 bg-white/95 dark:bg-slate-900/95 backdrop-blur-md border-t border-slate-200/80 dark:border-slate-800 safe-bottom">\
+    <div class="max-w-md mx-auto grid grid-cols-5 h-14">\
+      <button id="nav-decks" onclick="switchView('decks')" class="nav-btn flex flex-col items-center justify-center text-teal-600 dark:text-teal-400 font-bold transition-all">\
+        <i class="fa-solid fa-folder-tree text-base"></i>\
+        <span class="text-[10px] mt-0.5">\uc0\u12487 \u12483 \u12461 </span>\
+      </button>\
+\
+      <button id="nav-study" onclick="switchView('study')" class="nav-btn flex flex-col items-center justify-center text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 transition-all relative">\
+        <div class="relative">\
+          <i class="fa-solid fa-graduation-cap text-lg"></i>\
+          <span id="nav-due-count" class="absolute -top-1 -right-2 px-1 text-[9px] rounded-full bg-teal-500 text-white font-bold leading-none min-w-[14px] h-[14px] flex items-center justify-center">0</span>\
+        </div>\
+        <span class="text-[10px] mt-0.5">\uc0\u23398 \u32722 </span>\
+      </button>\
+\
+      <button id="nav-cards" onclick="switchView('cards')" class="nav-btn flex flex-col items-center justify-center text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 transition-all relative">\
+        <div class="relative">\
+          <i class="fa-solid fa-layer-group text-base"></i>\
+          <span id="nav-total-count" class="absolute -top-1 -right-2.5 text-[9px] text-slate-400 font-semibold">0</span>\
+        </div>\
+        <span class="text-[10px] mt-0.5">\uc0\u21336 \u35486 \u24115 </span>\
+      </button>\
+\
+      <button id="nav-stats" onclick="switchView('stats')" class="nav-btn flex flex-col items-center justify-center text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 transition-all">\
+        <i class="fa-solid fa-chart-pie text-base"></i>\
+        <span class="text-[10px] mt-0.5">\uc0\u32113 \u35336 </span>\
+      </button>\
+\
+      <button id="nav-settings" onclick="switchView('settings')" class="nav-btn flex flex-col items-center justify-center text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 transition-all">\
+        <i class="fa-solid fa-sliders text-base"></i>\
+        <span class="text-[10px] mt-0.5">\uc0\u35373 \u23450 </span>\
+      </button>\
+    </div>\
+  </nav>\
+\
+  <!-- 1. Card Form Modal (Bottom Sheet style) -->\
+  <div id="card-modal" class="fixed inset-0 z-50 flex flex-col justify-end bg-slate-900/60 backdrop-blur-sm opacity-0 pointer-events-none transition-opacity duration-200">\
+    <div id="card-modal-box" class="bottom-sheet bottom-sheet-hidden bg-white dark:bg-slate-900 w-full max-w-lg mx-auto rounded-t-3xl border-t border-slate-200 dark:border-slate-800 shadow-2xl max-h-[90vh] flex flex-col">\
+      <div class="px-5 pt-3 pb-2 border-b border-slate-100 dark:border-slate-800 flex items-center justify-between relative">\
+        <div class="w-10 h-1 bg-slate-200 dark:bg-slate-700 rounded-full mx-auto absolute left-0 right-0 top-2.5"></div>\
+        <h3 id="modal-title" class="text-sm font-bold text-slate-800 dark:text-white mt-2">\uc0\u21336 \u35486 \u12459 \u12540 \u12489 \u12434 \u36861 \u21152 </h3>\
+        <button onclick="closeCardModal()" class="w-8 h-8 rounded-full text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 flex items-center justify-center">\
+          <i class="fa-solid fa-xmark text-sm"></i>\
+        </button>\
+      </div>\
+\
+      <form id="card-form" onsubmit="saveCard(event)" class="p-4 space-y-3 overflow-y-auto flex-1">\
+        <input type="hidden" id="card-edit-id" value="" />\
+        \
+        <div>\
+          <label class="block text-[11px] font-bold text-slate-600 dark:text-slate-300 mb-1">\uc0\u34920 \u38754  (\u21336 \u35486  / \u36074 \u21839 ) <span class="text-red-500">*</span></label>\
+          <input type="text" id="form-front" required placeholder="\uc0\u20363 : ubiquitous" class="w-full px-3 py-2 text-xs bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl focus:ring-1 focus:ring-teal-500 focus:outline-none" />\
+        </div>\
+\
+        <div>\
+          <label class="block text-[11px] font-bold text-slate-600 dark:text-slate-300 mb-1">\uc0\u35023 \u38754  (\u24847 \u21619  / \u35299 \u31572 ) <span class="text-red-500">*</span></label>\
+          <input type="text" id="form-back" required placeholder="\uc0\u20363 : \u12393 \u12371 \u12395 \u12391 \u12418 \u12354 \u12427 \u12289 \u20559 \u22312 \u12377 \u12427 " class="w-full px-3 py-2 text-xs bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl focus:ring-1 focus:ring-teal-500 focus:outline-none" />\
+        </div>\
+\
+        <div>\
+          <label class="block text-[11px] font-bold text-slate-600 dark:text-slate-300 mb-1">\uc0\u25152 \u23646 \u12487 \u12483 \u12461 </label>\
+          <select id="form-deck-select" onchange="onFormDeckChange(this.value)" class="w-full px-3 py-2 text-xs bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl focus:ring-1 focus:ring-teal-500 mb-1">\
+          </select>\
+          <input type="text" id="form-deck-custom" placeholder="\uc0\u26032 \u35215 \u12487 \u12483 \u12461 \u21517  (\u20363 : \u33521 \u35486 ::TOEIC::Part5)" class="w-full px-3 py-1.5 text-xs bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl focus:ring-1 focus:ring-teal-500 hidden" />\
+        </div>\
+\
+        <div>\
+          <label class="block text-[11px] font-bold text-slate-600 dark:text-slate-300 mb-1">\uc0\u30330 \u38899 \u35352 \u21495  (\u20219 \u24847 )</label>\
+          <input type="text" id="form-phonetic" placeholder="\uc0\u20363 : /ju\u720 \u712 b\u618 kw\u618 t\u601 s/" class="w-full px-3 py-2 text-xs bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl focus:ring-1 focus:ring-teal-500" />\
+        </div>\
+\
+        <div>\
+          <label class="block text-[11px] font-bold text-slate-600 dark:text-slate-300 mb-1">\uc0\u20363 \u25991 \u12392 \u26085 \u26412 \u35486 \u35379  (\u20219 \u24847 )</label>\
+          <input type="text" id="form-example" placeholder="Smartphones have become ubiquitous." class="w-full px-3 py-2 text-xs bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl focus:ring-1 focus:ring-teal-500 mb-1.5" />\
+          <input type="text" id="form-example-tr" placeholder="\uc0\u12473 \u12510 \u12540 \u12488 \u12501 \u12457 \u12531 \u12399 \u12393 \u12371 \u12395 \u12391 \u12418 \u12354 \u12427 \u23384 \u22312 \u12395 \u12394 \u12387 \u12383 \u12290 " class="w-full px-3 py-2 text-xs bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl focus:ring-1 focus:ring-teal-500" />\
+        </div>\
+\
+        <div>\
+          <label class="block text-[11px] font-bold text-slate-600 dark:text-slate-300 mb-1">\uc0\u12513 \u12514  (\u20219 \u24847 )</label>\
+          <input type="text" id="form-note" placeholder="\uc0\u35036 \u36275 \u24773 \u22577 \u12420 \u37325 \u35201 \u12509 \u12452 \u12531 \u12488 " class="w-full px-3 py-2 text-xs bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl focus:ring-1 focus:ring-teal-500" />\
+        </div>\
+\
+        <div class="pt-2 flex items-center justify-end space-x-2">\
+          <button type="button" onclick="closeCardModal()" class="px-4 py-2 text-xs font-semibold text-slate-500 rounded-xl">\
+            \uc0\u12461 \u12515 \u12531 \u12475 \u12523 \
+          </button>\
+          <button type="submit" class="px-5 py-2 bg-teal-600 active:bg-teal-700 text-white text-xs font-bold rounded-xl shadow-md active:scale-95 transition">\
+            \uc0\u20445 \u23384 \u12377 \u12427 \
+          </button>\
+        </div>\
+      </form>\
+    </div>\
+  </div>\
+\
+  <!-- 2. Import Target Modal -->\
+  <div id="import-modal" class="fixed inset-0 z-50 flex flex-col justify-end bg-slate-900/60 backdrop-blur-sm opacity-0 pointer-events-none transition-opacity duration-200">\
+    <div id="import-modal-box" class="bottom-sheet bottom-sheet-hidden bg-white dark:bg-slate-900 w-full max-w-lg mx-auto rounded-t-3xl border-t border-slate-200 dark:border-slate-800 shadow-2xl p-5">\
+      <div class="w-10 h-1 bg-slate-200 dark:bg-slate-700 rounded-full mx-auto mb-3"></div>\
+      <div class="flex items-center justify-between mb-3">\
+        <h3 class="text-sm font-bold text-slate-800 dark:text-white flex items-center space-x-1.5">\
+          <i class="fa-solid fa-file-import text-teal-500"></i>\
+          <span>\uc0\u21336 \u35486 \u12501 \u12449 \u12452 \u12523 \u35501 \u12415 \u36796 \u12415  (CSV / JSON)</span>\
+        </h3>\
+        <button onclick="closeImportModal()" class="w-8 h-8 rounded-full text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 flex items-center justify-center">\
+          <i class="fa-solid fa-xmark text-sm"></i>\
+        </button>\
+      </div>\
+\
+      <div class="space-y-3.5">\
+        <div>\
+          <label class="block text-[11px] font-bold text-slate-600 dark:text-slate-300 mb-1">\uc0\u12452 \u12531 \u12509 \u12540 \u12488 \u20808 \u12487 \u12483 \u12461 \u12398 \u25351 \u23450 </label>\
+          <select id="import-deck-target-select" onchange="onImportDeckSelectChange(this.value)" class="w-full px-3 py-2 text-xs bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl focus:ring-1 focus:ring-teal-500 mb-1.5">\
+            <option value="__from_csv__">CSV\uc0\u20869 \u12398 \u12487 \u12483 \u12461 \u25351 \u23450 \u12434 \u20778 \u20808 \u65288 \u31354 \u27396 \u26178 \u12399 \u19968 \u33324 \u65289 </option>\
+          </select>\
+          <input type="text" id="import-deck-custom" placeholder="\uc0\u26032 \u35215 \u12487 \u12483 \u12461 \u21517 \u12434 \u20837 \u21147  (\u20363 : \u33521 \u35486 ::TOEIC900)" class="w-full px-3 py-1.5 text-xs bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl focus:ring-1 focus:ring-teal-500 hidden" />\
+          <p class="text-[10px] text-slate-400 mt-1">\uc0\u29305 \u23450 \u12398 \u12487 \u12483 \u12461 \u12434 \u36984 \u25246 \u12377 \u12427 \u12392 \u12289 CSV\u20869 \u12398 \u21336 \u35486 \u12434 \u12377 \u12409 \u12390 \u12381 \u12398 \u12487 \u12483 \u12461 \u12395 \u30331 \u37682 \u12375 \u12414 \u12377 \u12290 </p>\
+        </div>\
+\
+        <div class="pt-2">\
+          <label class="w-full py-3 px-4 bg-teal-600 active:bg-teal-700 text-white font-bold rounded-2xl text-xs shadow-md active:scale-95 transition flex items-center justify-center space-x-2 cursor-pointer">\
+            <i class="fa-solid fa-file-arrow-up text-sm"></i>\
+            <span>CSV / TSV / JSON \uc0\u12501 \u12449 \u12452 \u12523 \u12434 \u36984 \u25246 </span>\
+            <input type="file" id="modal-import-file" accept=".csv,.tsv,.txt,.json" onchange="handleModalFileImport(event)" class="hidden" />\
+          </label>\
+        </div>\
+\
+        <div class="text-center pt-1">\
+          <button type="button" onclick="downloadCSVTemplate()" class="text-[11px] text-teal-600 dark:text-teal-400 font-semibold hover:underline">\
+            <i class="fa-solid fa-download mr-1"></i>\uc0\u12452 \u12531 \u12509 \u12540 \u12488 \u29992 CSV\u38619 \u24418 \u12434 \u12480 \u12454 \u12531 \u12525 \u12540 \u12489 \
+          </button>\
+        </div>\
+      </div>\
+    </div>\
+  </div>\
+\
+  <!-- 3. Deck Form Modal -->\
+  <div id="deck-modal" class="fixed inset-0 z-50 flex flex-col justify-end bg-slate-900/60 backdrop-blur-sm opacity-0 pointer-events-none transition-opacity duration-200">\
+    <div id="deck-modal-box" class="bottom-sheet bottom-sheet-hidden bg-white dark:bg-slate-900 w-full max-w-lg mx-auto rounded-t-3xl border-t border-slate-200 dark:border-slate-800 shadow-2xl p-5">\
+      <div class="w-10 h-1 bg-slate-200 dark:bg-slate-700 rounded-full mx-auto mb-3"></div>\
+      <div class="flex items-center justify-between mb-3">\
+        <h3 id="deck-modal-title" class="text-sm font-bold text-slate-800 dark:text-white">\uc0\u12487 \u12483 \u12461 \u20316 \u25104 </h3>\
+        <button onclick="closeDeckModal()" class="w-8 h-8 rounded-full text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 flex items-center justify-center">\
+          <i class="fa-solid fa-xmark text-sm"></i>\
+        </button>\
+      </div>\
+\
+      <form id="deck-form" onsubmit="saveDeck(event)" class="space-y-3">\
+        <input type="hidden" id="deck-edit-original" value="" />\
+\
+        <div>\
+          <label class="block text-[11px] font-bold text-slate-600 dark:text-slate-300 mb-1">\uc0\u35242 \u12487 \u12483 \u12461  (\u20219 \u24847 )</label>\
+          <select id="deck-parent-select" class="w-full px-3 py-2 text-xs bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl focus:ring-1 focus:ring-teal-500">\
+            <option value="">(\uc0\u12394 \u12375 : \u12488 \u12483 \u12503 \u12524 \u12505 \u12523 \u12395 \u20316 \u25104 )</option>\
+          </select>\
+        </div>\
+\
+        <div>\
+          <label class="block text-[11px] font-bold text-slate-600 dark:text-slate-300 mb-1">\uc0\u12487 \u12483 \u12461 \u21517  <span class="text-red-500">*</span></label>\
+          <input type="text" id="deck-name-input" required placeholder="\uc0\u20363 : TOEIC 800\u28857 " class="w-full px-3 py-2 text-xs bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl focus:ring-1 focus:ring-teal-500" />\
+        </div>\
+\
+        <div class="pt-2 flex items-center justify-end space-x-2">\
+          <button type="button" onclick="closeDeckModal()" class="px-4 py-2 text-xs font-semibold text-slate-500 rounded-xl">\
+            \uc0\u12461 \u12515 \u12531 \u12475 \u12523 \
+          </button>\
+          <button type="submit" class="px-5 py-2 bg-teal-600 active:bg-teal-700 text-white text-xs font-bold rounded-xl shadow-md active:scale-95 transition">\
+            \uc0\u20445 \u23384 \u12377 \u12427 \
+          </button>\
+        </div>\
+      </form>\
+    </div>\
+  </div>\
+\
+  <!-- 4. Confirm Modal -->\
+  <div id="confirm-modal" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm opacity-0 pointer-events-none transition-opacity duration-200">\
+    <div class="bg-white dark:bg-slate-900 w-full max-w-xs rounded-3xl shadow-2xl p-5 border border-slate-200 dark:border-slate-800 text-center">\
+      <div class="w-10 h-10 mx-auto mb-2 rounded-2xl bg-red-100 text-red-600 flex items-center justify-center text-lg">\
+        <i class="fa-solid fa-triangle-exclamation"></i>\
+      </div>\
+      <h4 id="confirm-title" class="text-sm font-bold text-slate-800 dark:text-white mb-1">\uc0\u30906 \u35469 </h4>\
+      <p id="confirm-msg" class="text-xs text-slate-400 mb-5">\uc0\u26412 \u24403 \u12395 \u23455 \u34892 \u12375 \u12414 \u12377 \u12363 \u65311 </p>\
+      <div class="flex items-center space-x-2">\
+        <button id="confirm-btn-cancel" class="w-1/2 py-2 text-xs font-semibold text-slate-600 dark:text-slate-300 bg-slate-100 dark:bg-slate-800 rounded-xl">\uc0\u12461 \u12515 \u12531 \u12475 \u12523 </button>\
+        <button id="confirm-btn-ok" class="w-1/2 py-2 text-xs font-bold text-white bg-red-600 active:bg-red-700 rounded-xl">\uc0\u23455 \u34892 </button>\
+      </div>\
+    </div>\
+  </div>\
+\
+  <!-- Toast Notification Container -->\
+  <div id="toast-container" class="fixed bottom-16 left-4 right-4 z-50 flex flex-col space-y-2 pointer-events-none items-center"></div>\
+\
+  <script>\
+    const DEFAULT_PRESET_CARDS = [\
+      \{\
+        id: "c1",\
+        front: "ubiquitous",\
+        back: "\uc0\u12393 \u12371 \u12395 \u12391 \u12418 \u12354 \u12427 \u12289 \u20559 \u22312 \u12377 \u12427 ",\
+        deck: "\uc0\u33521 \u35486 ::TOEIC\u24517 \u20462 ",\
+        phonetic: "/ju\uc0\u720 \u712 b\u618 kw\u618 t\u601 s/",\
+        example: "Smartphones have become ubiquitous in modern society.",\
+        exampleTr: "\uc0\u12473 \u12510 \u12540 \u12488 \u12501 \u12457 \u12531 \u12399 \u29694 \u20195 \u31038 \u20250 \u12395 \u12362 \u12356 \u12390 \u12393 \u12371 \u12395 \u12391 \u12418 \u12354 \u12427 \u23384 \u22312 \u12395 \u12394 \u12387 \u12383 \u12290 ",\
+        note: "",\
+        repetition: 0,\
+        interval: 0,\
+        easeFactor: 2.5,\
+        nextReview: new Date().toISOString(),\
+        lastReview: null,\
+        reviewCount: 0\
+      \},\
+      \{\
+        id: "c2",\
+        front: "meticulous",\
+        back: "\uc0\u32048 \u24515 \u12398 \u27880 \u24847 \u12434 \u25173 \u12358 \u12289 \u26997 \u12417 \u12390 \u20960 \u24115 \u38754 \u12394 ",\
+        deck: "\uc0\u33521 \u35486 ::TOEIC\u24517 \u20462 ",\
+        phonetic: "/m\uc0\u601 \u712 t\u618 kj\u601 l\u601 s/",\
+        example: "She did meticulous research before writing the report.",\
+        exampleTr: "\uc0\u24444 \u22899 \u12399 \u22577 \u21578 \u26360 \u12434 \u26360 \u12367 \u21069 \u12395 \u32191 \u23494 \u12394 \u35519 \u26619 \u12434 \u34892 \u12387 \u12383 \u12290 ",\
+        note: "",\
+        repetition: 0,\
+        interval: 0,\
+        easeFactor: 2.5,\
+        nextReview: new Date().toISOString(),\
+        lastReview: null,\
+        reviewCount: 0\
+      \},\
+      \{\
+        id: "c3",\
+        front: "pragmatic",\
+        back: "\uc0\u23455 \u36341 \u30340 \u12394 \u12289 \u23455 \u29992 \u20027 \u32681 \u12398 ",\
+        deck: "\uc0\u33521 \u35486 ::\u12499 \u12472 \u12493 \u12473 ::\u20132 \u28169 ",\
+        phonetic: "/pr\'e6\uc0\u609 \u712 m\'e6t\u618 k/",\
+        example: "We need to take a pragmatic approach to solving this issue.",\
+        exampleTr: "\uc0\u31169 \u12383 \u12385 \u12399 \u12371 \u12398 \u21839 \u38988 \u12434 \u35299 \u27770 \u12377 \u12427 \u12383 \u12417 \u12395 \u29694 \u23455 \u30340 \u12394 \u12450 \u12503 \u12525 \u12540 \u12481 \u12434 \u12392 \u12427 \u24517 \u35201 \u12364 \u12354 \u12427 \u12290 ",\
+        note: "",\
+        repetition: 0,\
+        interval: 0,\
+        easeFactor: 2.5,\
+        nextReview: new Date().toISOString(),\
+        lastReview: null,\
+        reviewCount: 0\
+      \},\
+      \{\
+        id: "c4",\
+        front: "lucid",\
+        back: "\uc0\u26126 \u24555 \u12394 \u12289 \u20998 \u12363 \u12426 \u12420 \u12377 \u12356 ",\
+        deck: "\uc0\u33521 \u35486 ::TOEIC\u24517 \u20462 ",\
+        phonetic: "/\uc0\u712 lu\u720 s\u618 d/",\
+        example: "The professor gave a lucid explanation of the complex theory.",\
+        exampleTr: "\uc0\u25945 \u25480 \u12399 \u12381 \u12398 \u35079 \u38609 \u12394 \u29702 \u35542 \u12395 \u12388 \u12356 \u12390 \u26126 \u24555 \u12394 \u35500 \u26126 \u12434 \u12375 \u12383 \u12290 ",\
+        note: "",\
+        repetition: 0,\
+        interval: 0,\
+        easeFactor: 2.5,\
+        nextReview: new Date().toISOString(),\
+        lastReview: null,\
+        reviewCount: 0\
+      \},\
+      \{\
+        id: "c5",\
+        front: "resilient",\
+        back: "\uc0\u22238 \u24489 \u21147 \u12364 \u12354 \u12427 \u12289 \u31435 \u12385 \u30452 \u12426 \u12398 \u26089 \u12356 ",\
+        deck: "\uc0\u33521 \u35486 ::\u12499 \u12472 \u12493 \u12473 ::\u12513 \u12531 \u12479 \u12523 ",\
+        phonetic: "/r\uc0\u618 \u712 z\u618 li\u601 nt/",\
+        example: "Local businesses proved remarkably resilient during the crisis.",\
+        exampleTr: "\uc0\u22320 \u20803 \u20225 \u26989 \u12399 \u21361 \u27231 \u12398 \u26368 \u20013 \u12395 \u30446 \u35226 \u12414 \u12375 \u12356 \u22238 \u24489 \u21147 \u12434 \u30330 \u25582 \u12375 \u12383 \u12290 ",\
+        note: "",\
+        repetition: 0,\
+        interval: 0,\
+        easeFactor: 2.5,\
+        nextReview: new Date().toISOString(),\
+        lastReview: null,\
+        reviewCount: 0\
+      \}\
+    ];\
+\
+    let cards = [];\
+    let customDecks = [];\
+    let studyQueue = [];\
+    let currentCardIndex = 0;\
+    let isFlipped = false;\
+    let currentStudyDeck = 'all';\
+    let isCramMode = false;\
+\
+    // Daily Learning Limits and App Settings\
+    let appSettings = \{\
+      dailyNewLimit: 20,\
+      dailyDueLimit: 50,\
+      autoSpeak: false\
+    \};\
+\
+    let dailyStats = \{\
+      date: new Date().toISOString().slice(0, 10),\
+      newCount: 0,\
+      dueCount: 0\
+    \};\
+\
+    function initApp() \{\
+      // 1. Load Cards\
+      const savedCards = localStorage.getItem('flashsrs_cards');\
+      if (savedCards) \{\
+        try \{ cards = JSON.parse(savedCards); \} catch(e) \{ cards = [...DEFAULT_PRESET_CARDS]; \}\
+      \} else \{\
+        cards = [...DEFAULT_PRESET_CARDS];\
+        saveToStorage();\
+      \}\
+\
+      // 2. Load Custom Decks\
+      const savedDecks = localStorage.getItem('flashsrs_decks');\
+      if (savedDecks) \{\
+        try \{ customDecks = JSON.parse(savedDecks); \} catch(e) \{ customDecks = []; \}\
+      \}\
+\
+      // 3. Load Settings\
+      const savedSettings = localStorage.getItem('flashsrs_settings');\
+      if (savedSettings) \{\
+        try \{ appSettings = \{ ...appSettings, ...JSON.parse(savedSettings) \}; \} catch(e) \{\}\
+      \}\
+\
+      // 4. Load Daily Stats (Reset if date changed)\
+      const todayStr = new Date().toISOString().slice(0, 10);\
+      const savedStats = localStorage.getItem('flashsrs_daily_stats');\
+      if (savedStats) \{\
+        try \{\
+          const parsed = JSON.parse(savedStats);\
+          if (parsed.date === todayStr) \{\
+            dailyStats = parsed;\
+          \} else \{\
+            dailyStats = \{ date: todayStr, newCount: 0, dueCount: 0 \};\
+            saveDailyStats();\
+          \}\
+        \} catch(e) \{\
+          dailyStats = \{ date: todayStr, newCount: 0, dueCount: 0 \};\
+        \}\
+      \} else \{\
+        dailyStats = \{ date: todayStr, newCount: 0, dueCount: 0 \};\
+        saveDailyStats();\
+      \}\
+\
+      // 5. Theme setup\
+      if (localStorage.getItem('flashsrs_theme') === 'dark' || \
+          (!('flashsrs_theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) \{\
+        document.documentElement.classList.add('dark');\
+        document.getElementById('theme-icon').className = 'fa-solid fa-sun text-xs';\
+      \}\
+\
+      setupTouchAndKeyboardShortcuts();\
+      updateDeckDropdowns();\
+      renderSettingsUI();\
+      updateGlobalCounters();\
+\
+      // App initial entry screen: Deck list\
+      switchView('decks');\
+    \}\
+\
+    function saveToStorage() \{\
+      localStorage.setItem('flashsrs_cards', JSON.stringify(cards));\
+      localStorage.setItem('flashsrs_decks', JSON.stringify(customDecks));\
+      updateGlobalCounters();\
+      updateDeckDropdowns();\
+    \}\
+\
+    function saveSettings() \{\
+      localStorage.setItem('flashsrs_settings', JSON.stringify(appSettings));\
+      renderSettingsUI();\
+    \}\
+\
+    function saveDailyStats() \{\
+      localStorage.setItem('flashsrs_daily_stats', JSON.stringify(dailyStats));\
+    \}\
+\
+    function isCardInDeckHierarchy(cardDeck, selectedDeck) \{\
+      if (!selectedDeck || selectedDeck === 'all') return true;\
+      const cDeck = cardDeck || '\uc0\u19968 \u33324 ';\
+      return cDeck === selectedDeck || cDeck.startsWith(selectedDeck + '::');\
+    \}\
+\
+    function getAllDeckPaths() \{\
+      const set = new Set(customDecks);\
+      cards.forEach(c => \{\
+        const deck = c.deck || '\uc0\u19968 \u33324 ';\
+        set.add(deck);\
+        const parts = deck.split('::');\
+        let acc = '';\
+        for (let i = 0; i < parts.length; i++) \{\
+          acc = acc ? `$\{acc\}::$\{parts[i]\}` : parts[i];\
+          set.add(acc);\
+        \}\
+      \});\
+      return Array.from(set).sort((a, b) => a.localeCompare(b, 'ja'));\
+    \}\
+\
+    function buildDeckTree() \{\
+      const paths = getAllDeckPaths();\
+      const root = \{\};\
+      paths.forEach(fullPath => \{\
+        const parts = fullPath.split('::');\
+        let current = root;\
+        let currPath = '';\
+        parts.forEach(part => \{\
+          currPath = currPath ? `$\{currPath\}::$\{part\}` : part;\
+          if (!current[part]) \{\
+            current[part] = \{ name: part, fullPath: currPath, children: \{\} \};\
+          \}\
+          current = current[part].children;\
+        \});\
+      \});\
+      return root;\
+    \}\
+\
+    function calculateSRS(card, rating) \{\
+      let \{ repetition = 0, interval = 0, easeFactor = 2.5 \} = card;\
+      const now = new Date();\
+      let nextIntervalDays = 1;\
+\
+      if (rating === 1) \{\
+        repetition = 0;\
+        nextIntervalDays = 0;\
+        easeFactor = Math.max(1.3, easeFactor - 0.2);\
+      \} else if (rating === 2) \{\
+        repetition = Math.max(1, repetition);\
+        nextIntervalDays = interval === 0 ? 1 : Math.round(interval * 1.2);\
+        easeFactor = Math.max(1.3, easeFactor - 0.15);\
+      \} else if (rating === 3) \{\
+        if (repetition === 0) nextIntervalDays = 1;\
+        else if (repetition === 1) nextIntervalDays = 3;\
+        else nextIntervalDays = Math.round(interval * easeFactor);\
+        repetition += 1;\
+      \} else if (rating === 4) \{\
+        if (repetition === 0) nextIntervalDays = 3;\
+        else if (repetition === 1) nextIntervalDays = 6;\
+        else nextIntervalDays = Math.round(interval * easeFactor * 1.35);\
+        repetition += 1;\
+        easeFactor += 0.15;\
+      \}\
+\
+      if (nextIntervalDays < 1 && rating > 1) nextIntervalDays = 1;\
+\
+      let nextReviewDate = new Date();\
+      if (nextIntervalDays === 0) \{\
+        nextReviewDate = new Date(now.getTime() + 10 * 60 * 1000);\
+      \} else \{\
+        nextReviewDate.setDate(now.getDate() + nextIntervalDays);\
+        nextReviewDate.setHours(4, 0, 0, 0);\
+      \}\
+\
+      return \{\
+        repetition,\
+        interval: nextIntervalDays,\
+        easeFactor: Number(easeFactor.toFixed(2)),\
+        nextReview: nextReviewDate.toISOString(),\
+        lastReview: now.toISOString(),\
+        reviewCount: (card.reviewCount || 0) + 1\
+      \};\
+    \}\
+\
+    function isCardDue(card) \{\
+      if (!card.nextReview) return true;\
+      return new Date(card.nextReview) <= new Date();\
+    \}\
+\
+    function prepareStudySession() \{\
+      // 1. Separate into New cards vs Due (Review) cards\
+      let allMatching = cards.filter(c => isCardInDeckHierarchy(c.deck, currentStudyDeck));\
+\
+      let newCandidates = allMatching.filter(c => !c.reviewCount || c.reviewCount === 0);\
+      let dueCandidates = allMatching.filter(c => (c.reviewCount > 0) && isCardDue(c));\
+\
+      // Calculate remaining daily allowance\
+      const newAllowed = Math.max(0, appSettings.dailyNewLimit - (dailyStats.newCount || 0));\
+      const dueAllowed = Math.max(0, appSettings.dailyDueLimit - (dailyStats.dueCount || 0));\
+\
+      // Sort review cards (most overdue first)\
+      dueCandidates.sort((a, b) => new Date(a.nextReview || 0) - new Date(b.nextReview || 0));\
+\
+      const selectedDue = dueCandidates.slice(0, dueAllowed);\
+      const selectedNew = newCandidates.slice(0, newAllowed);\
+\
+      studyQueue = [...selectedDue, ...selectedNew];\
+      currentCardIndex = 0;\
+      isCramMode = false;\
+\
+      // Update Limit Labels in Study Header\
+      const limitNewText = document.getElementById('limit-new-text');\
+      const limitDueText = document.getElementById('limit-due-text');\
+      if (limitNewText) limitNewText.innerText = appSettings.dailyNewLimit >= 9999 ? '\uc0\u8734 ' : appSettings.dailyNewLimit;\
+      if (limitDueText) limitDueText.innerText = appSettings.dailyDueLimit >= 9999 ? '\uc0\u8734 ' : appSettings.dailyDueLimit;\
+\
+      renderCurrentCard();\
+      updateQueueBadges();\
+    \}\
+\
+    function startCramMode() \{\
+      let filtered = cards.filter(c => isCardInDeckHierarchy(c.deck, currentStudyDeck));\
+      if (filtered.length === 0) \{\
+        showToast('\uc0\u12459 \u12540 \u12489 \u12364 \u12354 \u12426 \u12414 \u12379 \u12435 ', 'error');\
+        return;\
+      \}\
+      studyQueue = [...filtered].sort(() => Math.random() - 0.5);\
+      currentCardIndex = 0;\
+      isCramMode = true;\
+      renderCurrentCard();\
+      showToast('\uc0\u19978 \u38480 \u12434 \u28961 \u35222 \u12375 \u12390 \u20840 \u12459 \u12540 \u12489 \u24489 \u32722 \u38283 \u22987 \u65281 ', 'info');\
+    \}\
+\
+    function renderCurrentCard() \{\
+      const stage = document.getElementById('study-stage');\
+      const emptyStage = document.getElementById('study-empty-stage');\
+      const cardInner = document.getElementById('flashcard-inner');\
+      const actionBar = document.getElementById('srs-action-bar');\
+\
+      isFlipped = false;\
+      cardInner.classList.remove('card-flipped');\
+      actionBar.classList.add('opacity-30', 'pointer-events-none');\
+\
+      if (studyQueue.length === 0 || currentCardIndex >= studyQueue.length) \{\
+        stage.classList.add('hidden');\
+        emptyStage.classList.remove('hidden');\
+        document.getElementById('session-progress-text').innerText = '\uc0\u23436 \u20102 \u65281 ';\
+        document.getElementById('session-progress-bar').style.width = '100%';\
+\
+        // Display today's review counts\
+        const todayDateLabel = document.getElementById('today-date-label');\
+        const todayFinNew = document.getElementById('today-finished-new');\
+        const todayFinDue = document.getElementById('today-finished-due');\
+        if (todayDateLabel) todayDateLabel.innerText = dailyStats.date;\
+        if (todayFinNew) todayFinNew.innerText = `$\{dailyStats.newCount\} \uc0\u26522 `;\
+        if (todayFinDue) todayFinDue.innerText = `$\{dailyStats.dueCount\} \uc0\u26522 `;\
+        return;\
+      \}\
+\
+      stage.classList.remove('hidden');\
+      emptyStage.classList.add('hidden');\
+\
+      const card = studyQueue[currentCardIndex];\
+\
+      // Front\
+      document.getElementById('card-front-tag').innerText = card.deck || '\uc0\u19968 \u33324 ';\
+      document.getElementById('card-front-text').innerText = card.front;\
+      document.getElementById('card-front-phonetic').innerText = card.phonetic || '';\
+      \
+      const hintElem = document.getElementById('card-front-hint');\
+      if (card.note) \{\
+        hintElem.innerText = `\uc0\u55357 \u56481  $\{card.note\}`;\
+        hintElem.classList.remove('hidden');\
+      \} else \{\
+        hintElem.classList.add('hidden');\
+      \}\
+\
+      // Back\
+      document.getElementById('card-back-tag').innerText = card.deck || '\uc0\u19968 \u33324 ';\
+      document.getElementById('card-back-text').innerText = card.back;\
+      document.getElementById('card-interval-badge').innerText = `\uc0\u32722 \u29087 : $\{card.interval || 0\}\u26085 `;\
+\
+      const exampleBox = document.getElementById('card-example-box');\
+      if (card.example) \{\
+        exampleBox.classList.remove('hidden');\
+        document.getElementById('card-back-example').innerText = card.example;\
+        document.getElementById('card-back-example-tr').innerText = card.exampleTr || '';\
+      \} else \{\
+        exampleBox.classList.add('hidden');\
+      \}\
+\
+      const noteElem = document.getElementById('card-back-note');\
+      if (card.note) \{\
+        noteElem.innerText = `\uc0\u12513 \u12514 : $\{card.note\}`;\
+        noteElem.classList.remove('hidden');\
+      \} else \{\
+        noteElem.classList.add('hidden');\
+      \}\
+\
+      // Button times\
+      const estHard = calculateSRS(card, 2);\
+      const estGood = calculateSRS(card, 3);\
+      const estEasy = calculateSRS(card, 4);\
+\
+      document.getElementById('time-again').innerText = '<10\uc0\u20998 ';\
+      document.getElementById('time-hard').innerText = `$\{estHard.interval\}\uc0\u26085 \u24460 `;\
+      document.getElementById('time-good').innerText = `$\{estGood.interval\}\uc0\u26085 \u24460 `;\
+      document.getElementById('time-easy').innerText = `$\{estEasy.interval\}\uc0\u26085 \u24460 `;\
+\
+      // Progress bar\
+      const remaining = studyQueue.length - currentCardIndex;\
+      document.getElementById('session-progress-text').innerText = `\uc0\u27531 \u12426  $\{remaining\} / $\{studyQueue.length\} \u26522 `;\
+      const pct = (currentCardIndex / studyQueue.length) * 100;\
+      document.getElementById('session-progress-bar').style.width = `$\{pct\}%`;\
+\
+      // Auto speak if enabled\
+      if (appSettings.autoSpeak) \{\
+        setTimeout(speakCurrentWord, 200);\
+      \}\
+    \}\
+\
+    function flipCard() \{\
+      if (studyQueue.length === 0 || currentCardIndex >= studyQueue.length) return;\
+      isFlipped = !isFlipped;\
+      const cardInner = document.getElementById('flashcard-inner');\
+      const actionBar = document.getElementById('srs-action-bar');\
+\
+      if (isFlipped) \{\
+        cardInner.classList.add('card-flipped');\
+        actionBar.classList.remove('opacity-30', 'pointer-events-none');\
+      \} else \{\
+        cardInner.classList.remove('card-flipped');\
+        actionBar.classList.add('opacity-30', 'pointer-events-none');\
+      \}\
+    \}\
+\
+    function rateCard(rating) \{\
+      if (studyQueue.length === 0 || currentCardIndex >= studyQueue.length) return;\
+\
+      const currentCard = studyQueue[currentCardIndex];\
+      const isInitialNew = !currentCard.reviewCount || currentCard.reviewCount === 0;\
+\
+      const updatedStats = calculateSRS(currentCard, rating);\
+\
+      const cardIdx = cards.findIndex(c => c.id === currentCard.id);\
+      if (cardIdx !== -1) \{\
+        cards[cardIdx] = \{ ...cards[cardIdx], ...updatedStats \};\
+        saveToStorage();\
+      \}\
+\
+      // Record daily limit stats (only on first pass in this session)\
+      if (!isCramMode) \{\
+        if (isInitialNew) \{\
+          dailyStats.newCount = (dailyStats.newCount || 0) + 1;\
+        \} else \{\
+          dailyStats.dueCount = (dailyStats.dueCount || 0) + 1;\
+        \}\
+        saveDailyStats();\
+      \}\
+\
+      if (rating === 1 && !isCramMode && cardIdx !== -1) \{\
+        studyQueue.push(cards[cardIdx]);\
+      \}\
+\
+      currentCardIndex++;\
+      renderCurrentCard();\
+      updateQueueBadges();\
+    \}\
+\
+    function resetSession() \{\
+      prepareStudySession();\
+      showToast('\uc0\u12475 \u12483 \u12471 \u12519 \u12531 \u12434 \u26356 \u26032 \u12375 \u12414 \u12375 \u12383 ', 'info');\
+    \}\
+\
+    function changeStudyDeck(deckName) \{\
+      currentStudyDeck = deckName;\
+      prepareStudySession();\
+    \}\
+\
+    function speakCurrentWord() \{\
+      if (studyQueue.length === 0 || currentCardIndex >= studyQueue.length) return;\
+      const card = studyQueue[currentCardIndex];\
+      if (!('speechSynthesis' in window)) \{\
+        showToast('\uc0\u38899 \u22768 \u35501 \u12415 \u19978 \u12370 \u38750 \u23550 \u24540 \u12398 \u29872 \u22659 \u12391 \u12377 ', 'error');\
+        return;\
+      \}\
+      window.speechSynthesis.cancel();\
+      const utterance = new SpeechSynthesisUtterance(card.front);\
+      utterance.lang = 'en-US';\
+      utterance.rate = 0.9;\
+      window.speechSynthesis.speak(utterance);\
+    \}\
+\
+    function setupTouchAndKeyboardShortcuts() \{\
+      window.addEventListener('keydown', (e) => \{\
+        if (['INPUT', 'SELECT', 'TEXTAREA'].includes(e.target.tagName)) return;\
+        const studySection = document.getElementById('view-study');\
+        if (studySection.classList.contains('hidden')) return;\
+\
+        if (e.code === 'Space') \{\
+          e.preventDefault();\
+          flipCard();\
+        \} else if (isFlipped) \{\
+          if (e.key === '1') rateCard(1);\
+          if (e.key === '2') rateCard(2);\
+          if (e.key === '3') rateCard(3);\
+          if (e.key === '4') rateCard(4);\
+        \}\
+      \});\
+    \}\
+\
+    function switchView(viewName) \{\
+      document.querySelectorAll('.view-section').forEach(el => el.classList.add('hidden'));\
+      document.querySelectorAll('.nav-btn').forEach(el => \{\
+        el.classList.remove('text-teal-600', 'dark:text-teal-400');\
+        el.classList.add('text-slate-400');\
+      \});\
+\
+      const activeNav = document.getElementById(`nav-$\{viewName\}`);\
+      if (activeNav) \{\
+        activeNav.classList.remove('text-slate-400');\
+        activeNav.classList.add('text-teal-600', 'dark:text-teal-400');\
+      \}\
+\
+      if (viewName === 'study') \{\
+        document.getElementById('view-study').classList.remove('hidden');\
+        prepareStudySession();\
+      \} else if (viewName === 'decks') \{\
+        document.getElementById('view-decks').classList.remove('hidden');\
+        renderDeckTree();\
+      \} else if (viewName === 'cards') \{\
+        document.getElementById('view-cards').classList.remove('hidden');\
+        renderCardsList();\
+      \} else if (viewName === 'stats') \{\
+        document.getElementById('view-stats').classList.remove('hidden');\
+        renderStats();\
+      \} else if (viewName === 'settings') \{\
+        document.getElementById('view-settings').classList.remove('hidden');\
+        renderSettingsUI();\
+      \}\
+      window.scrollTo(\{ top: 0, behavior: 'smooth' \});\
+    \}\
+\
+    function renderSettingsUI() \{\
+      // 1. New card limits\
+      const newLimitVal = document.getElementById('setting-new-limit-val');\
+      if (newLimitVal) \{\
+        newLimitVal.innerText = appSettings.dailyNewLimit >= 9999 ? '\uc0\u28961 \u21046 \u38480 ' : `$\{appSettings.dailyNewLimit\}\u26522 `;\
+      \}\
+      document.querySelectorAll('.limit-btn-new').forEach(btn => \{\
+        const val = parseInt(btn.dataset.val, 10);\
+        if (val === appSettings.dailyNewLimit) \{\
+          btn.className = 'limit-btn-new py-1.5 px-2 rounded-xl text-xs font-bold bg-teal-600 text-white shadow-xs';\
+        \} else \{\
+          btn.className = 'limit-btn-new py-1.5 px-2 rounded-xl text-xs font-semibold bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300';\
+        \}\
+      \});\
+\
+      // 2. Due card limits\
+      const dueLimitVal = document.getElementById('setting-due-limit-val');\
+      if (dueLimitVal) \{\
+        dueLimitVal.innerText = appSettings.dailyDueLimit >= 9999 ? '\uc0\u28961 \u21046 \u38480 ' : `$\{appSettings.dailyDueLimit\}\u26522 `;\
+      \}\
+      document.querySelectorAll('.limit-btn-due').forEach(btn => \{\
+        const val = parseInt(btn.dataset.val, 10);\
+        if (val === appSettings.dailyDueLimit) \{\
+          btn.className = 'limit-btn-due py-1.5 px-2 rounded-xl text-xs font-bold bg-teal-600 text-white shadow-xs';\
+        \} else \{\
+          btn.className = 'limit-btn-due py-1.5 px-2 rounded-xl text-xs font-semibold bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300';\
+        \}\
+      \});\
+\
+      // 3. Audio toggle\
+      const autoSpeakCheckbox = document.getElementById('setting-auto-speak');\
+      if (autoSpeakCheckbox) \{\
+        autoSpeakCheckbox.checked = !!appSettings.autoSpeak;\
+      \}\
+    \}\
+\
+    function setDailyNewLimit(val) \{\
+      const num = parseInt(val, 10);\
+      if (isNaN(num) || num <= 0) return;\
+      appSettings.dailyNewLimit = num;\
+      saveSettings();\
+      showToast(`\uc0\u26032 \u35215 \u12459 \u12540 \u12489 \u19978 \u38480 \u12434  $\{num >= 9999 ? '\u28961 \u21046 \u38480 ' : num + '\u26522 '\} \u12395 \u35373 \u23450 \u12375 \u12414 \u12375 \u12383 `, 'success');\
+      prepareStudySession();\
+    \}\
+\
+    function setDailyDueLimit(val) \{\
+      const num = parseInt(val, 10);\
+      if (isNaN(num) || num <= 0) return;\
+      appSettings.dailyDueLimit = num;\
+      saveSettings();\
+      showToast(`\uc0\u24489 \u32722 \u12459 \u12540 \u12489 \u19978 \u38480 \u12434  $\{num >= 9999 ? '\u28961 \u21046 \u38480 ' : num + '\u26522 '\} \u12395 \u35373 \u23450 \u12375 \u12414 \u12375 \u12383 `, 'success');\
+      prepareStudySession();\
+    \}\
+\
+    function toggleAutoSpeak(checked) \{\
+      appSettings.autoSpeak = !!checked;\
+      saveSettings();\
+      showToast(`\uc0\u38899 \u22768 \u33258 \u21205 \u20877 \u29983 \u12434  $\{checked ? 'ON' : 'OFF'\} \u12395 \u12375 \u12414 \u12375 \u12383 `, 'info');\
+    \}\
+\
+    function resetTodayReviewCount() \{\
+      dailyStats = \{\
+        date: new Date().toISOString().slice(0, 10),\
+        newCount: 0,\
+        dueCount: 0\
+      \};\
+      saveDailyStats();\
+      prepareStudySession();\
+      showToast('\uc0\u26412 \u26085 \u12398 \u23398 \u32722 \u12459 \u12454 \u12531 \u12488 \u12434 \u12522 \u12475 \u12483 \u12488 \u12375 \u12414 \u12375 \u12383 ', 'success');\
+    \}\
+\
+    function updateDeckDropdowns() \{\
+      const deckPaths = getAllDeckPaths();\
+\
+      const formatOption = (path) => \{\
+        const depth = path.split('::').length - 1;\
+        const indent = '\uc0\u12288 '.repeat(depth) + (depth > 0 ? '\u8627  ' : '');\
+        const displayName = path.split('::').pop();\
+        return `<option value="$\{escapeHTML(path)\}">$\{indent\}$\{escapeHTML(displayName)\}</option>`;\
+      \};\
+      \
+      const studySelect = document.getElementById('study-deck-filter');\
+      if (studySelect) \{\
+        studySelect.innerHTML = '<option value="all">\uc0\u12377 \u12409 \u12390 \u12398 \u12487 \u12483 \u12461 \u65288 \u20840 \u20307 \u23398 \u32722 \u65289 </option>' + \
+          deckPaths.map(d => `<option value="$\{escapeHTML(d)\}" $\{currentStudyDeck === d ? 'selected' : ''\}>$\{escapeHTML(d)\}</option>`).join('');\
+      \}\
+\
+      const cardDeckFilter = document.getElementById('card-deck-filter');\
+      if (cardDeckFilter) \{\
+        const curVal = cardDeckFilter.value;\
+        cardDeckFilter.innerHTML = '<option value="all">\uc0\u12377 \u12409 \u12390 \u12398 \u12487 \u12483 \u12461 </option>' + \
+          deckPaths.map(d => `<option value="$\{escapeHTML(d)\}" $\{curVal === d ? 'selected' : ''\}>$\{escapeHTML(d)\}</option>`).join('');\
+      \}\
+\
+      const formDeckSelect = document.getElementById('form-deck-select');\
+      if (formDeckSelect) \{\
+        formDeckSelect.innerHTML = deckPaths.map(d => formatOption(d)).join('') + '<option value="__custom__">\uc0\u65291  \u26032 \u35215 \u12487 \u12483 \u12461 \u21517 \u12434 \u20837 \u21147 ...</option>';\
+      \}\
+\
+      const parentSelect = document.getElementById('deck-parent-select');\
+      if (parentSelect) \{\
+        parentSelect.innerHTML = '<option value="">(\uc0\u12394 \u12375 : \u12488 \u12483 \u12503 \u12524 \u12505 \u12523 )</option>' +\
+          deckPaths.map(d => `<option value="$\{escapeHTML(d)\}">$\{escapeHTML(d)\}</option>`).join('');\
+      \}\
+\
+      const importDeckSelect = document.getElementById('import-deck-target-select');\
+      if (importDeckSelect) \{\
+        importDeckSelect.innerHTML = `\
+          <option value="__from_csv__">CSV\uc0\u20869 \u12398 \u12487 \u12483 \u12461 \u25351 \u23450 \u12434 \u20778 \u20808 \u65288 \u31354 \u27396 \u26178 \u12399 \u19968 \u33324 \u65289 </option>\
+          <optgroup label="\uc0\u26082 \u23384 \u12487 \u12483 \u12461 \u12434 \u36984 \u25246 ">\
+            $\{deckPaths.map(d => formatOption(d)).join('')\}\
+          </optgroup>\
+          <option value="__custom__">\uc0\u65291  \u26032 \u35215 \u12487 \u12483 \u12461 \u12434 \u20316 \u25104 \u12375 \u12390 \u12452 \u12531 \u12509 \u12540 \u12488 ...</option>\
+        `;\
+      \}\
+    \}\
+\
+    function renderDeckTree() \{\
+      const container = document.getElementById('deck-tree-container');\
+      const tree = buildDeckTree();\
+      container.innerHTML = '';\
+\
+      const allDueCount = cards.filter(isCardDue).length;\
+      const allNewCount = cards.filter(c => !c.reviewCount || c.reviewCount === 0).length;\
+      const allTotal = cards.length;\
+\
+      // "All Decks" Quick Play header card\
+      const allCardRow = document.createElement('div');\
+      allCardRow.className = 'flex items-center justify-between py-3 px-2 bg-teal-50/60 dark:bg-teal-950/30 rounded-xl mb-2 cursor-pointer border border-teal-100 dark:border-teal-900/60 active:scale-[0.99] transition';\
+      allCardRow.onclick = (e) => \{\
+        if (!e.target.closest('button')) studySpecificDeck('all');\
+      \};\
+      allCardRow.innerHTML = `\
+        <div class="flex items-center space-x-2.5 flex-1 min-w-0">\
+          <div class="w-8 h-8 rounded-lg bg-teal-600 text-white flex items-center justify-center text-xs flex-shrink-0">\
+            <i class="fa-solid fa-layer-group"></i>\
+          </div>\
+          <div class="truncate">\
+            <div class="flex items-center space-x-1.5">\
+              <span class="font-extrabold text-xs text-slate-900 dark:text-white">\uc0\u12377 \u12409 \u12390 \u12398 \u12487 \u12483 \u12461  (\u20840 \u20307 \u23398 \u32722 )</span>\
+              <span class="text-[10px] text-teal-600 dark:text-teal-400 font-bold">($\{allTotal\})</span>\
+            </div>\
+            <div class="text-[10px] text-slate-500 dark:text-slate-400 mt-0.5">\
+              \uc0\u26032 :<span class="text-blue-500 font-bold">$\{allNewCount\}</span> / \u24489 :<span class="$\{allDueCount > 0 ? 'text-emerald-500 font-bold' : 'text-slate-400'\}">$\{allDueCount\}</span>\
+            </div>\
+          </div>\
+        </div>\
+        <div class="flex items-center space-x-1 flex-shrink-0">\
+          <button onclick="studySpecificDeck('all')" class="px-3 py-1.5 bg-teal-600 active:bg-teal-700 text-white text-[11px] font-bold rounded-xl active:scale-95 shadow-xs flex items-center space-x-1">\
+            <i class="fa-solid fa-play text-[9px]"></i>\
+            <span>\uc0\u23398 \u32722 </span>\
+          </button>\
+        </div>\
+      `;\
+      container.appendChild(allCardRow);\
+\
+      const renderNode = (node, depth = 0) => \{\
+        const fullPath = node.fullPath;\
+        const displayName = node.name;\
+        \
+        const matchingCards = cards.filter(c => isCardInDeckHierarchy(c.deck, fullPath));\
+        const newCount = matchingCards.filter(c => !c.reviewCount || c.reviewCount === 0).length;\
+        const dueCount = matchingCards.filter(isCardDue).length;\
+        const totalCount = matchingCards.length;\
+\
+        const row = document.createElement('div');\
+        row.className = 'flex items-center justify-between py-2.5 px-2 active:bg-slate-50 dark:active:bg-slate-800/60 rounded-xl transition cursor-pointer';\
+        row.onclick = (e) => \{\
+          if (!e.target.closest('button')) \{\
+            studySpecificDeck(fullPath);\
+          \}\
+        \};\
+        \
+        const indentPadding = depth * 14;\
+\
+        row.innerHTML = `\
+          <div class="flex items-center space-x-2 flex-1 min-w-0" style="padding-left: $\{indentPadding\}px">\
+            <i class="fa-solid $\{depth === 0 ? 'fa-folder text-amber-500' : 'fa-folder-open text-teal-500'\} text-xs flex-shrink-0"></i>\
+            <div class="truncate">\
+              <span class="font-bold text-xs text-slate-800 dark:text-white">$\{escapeHTML(displayName)\}</span>\
+              <span class="text-[10px] text-slate-400 ml-1">($\{totalCount\})</span>\
+              <div class="text-[10px] text-slate-400">\
+                \uc0\u26032 :<span class="text-blue-500 font-bold">$\{newCount\}</span> / \u24489 :<span class="$\{dueCount > 0 ? 'text-emerald-500 font-bold' : 'text-slate-400'\}">$\{dueCount\}</span>\
+              </div>\
+            </div>\
+          </div>\
+          <div class="flex items-center space-x-1 flex-shrink-0">\
+            <button onclick="studySpecificDeck('$\{escapeHTML(fullPath)\}')" class="px-2.5 py-1 bg-teal-600 active:bg-teal-700 text-white text-[11px] font-bold rounded-lg active:scale-95 shadow-xs flex items-center space-x-1">\
+              <i class="fa-solid fa-play text-[8px]"></i>\
+              <span>\uc0\u23398 \u32722 </span>\
+            </button>\
+            <button onclick="openImportModal('$\{escapeHTML(fullPath)\}')" title="\uc0\u12371 \u12398 \u12487 \u12483 \u12461 \u12395 CSV\u35501 \u36796 " class="p-1.5 text-slate-400 hover:text-teal-600 text-xs">\
+              <i class="fa-solid fa-file-import"></i>\
+            </button>\
+            <button onclick="openSubDeckModal('$\{escapeHTML(fullPath)\}')" title="\uc0\u12469 \u12502 \u12487 \u12483 \u12461 \u20316 \u25104 " class="p-1.5 text-slate-400 hover:text-teal-600 text-xs">\
+              <i class="fa-solid fa-folder-plus"></i>\
+            </button>\
+            <button onclick="openEditDeckModal('$\{escapeHTML(fullPath)\}')" title="\uc0\u32232 \u38598 " class="p-1.5 text-slate-400 hover:text-indigo-600 text-xs">\
+              <i class="fa-solid fa-pen"></i>\
+            </button>\
+            <button onclick="deleteDeckHierarchy('$\{escapeHTML(fullPath)\}')" title="\uc0\u21066 \u38500 " class="p-1.5 text-slate-400 hover:text-red-500 text-xs">\
+              <i class="fa-solid fa-trash-can"></i>\
+            </button>\
+          </div>\
+        `;\
+        container.appendChild(row);\
+\
+        const childKeys = Object.keys(node.children).sort((a, b) => a.localeCompare(b, 'ja'));\
+        childKeys.forEach(k => renderNode(node.children[k], depth + 1));\
+      \};\
+\
+      const topKeys = Object.keys(tree).sort((a, b) => a.localeCompare(b, 'ja'));\
+      topKeys.forEach(k => renderNode(tree[k], 0));\
+    \}\
+\
+    function studySpecificDeck(deckPath) \{\
+      currentStudyDeck = deckPath;\
+      switchView('study');\
+      updateDeckDropdowns();\
+    \}\
+\
+    function renderCardsList() \{\
+      const searchInput = document.getElementById('card-search-input');\
+      const deckFilter = document.getElementById('card-deck-filter');\
+      const statusFilter = document.getElementById('card-status-filter');\
+      const container = document.getElementById('cards-list-container');\
+      const emptyNotice = document.getElementById('cards-empty-notice');\
+\
+      const query = (searchInput?.value || '').toLowerCase();\
+      const selectedDeck = deckFilter?.value || 'all';\
+      const selectedStatus = statusFilter?.value || 'all';\
+\
+      let filtered = cards.filter(card => \{\
+        if (!isCardInDeckHierarchy(card.deck, selectedDeck)) return false;\
+\
+        const isDue = isCardDue(card);\
+        const isNew = !card.reviewCount || card.reviewCount === 0;\
+        const isMastered = card.interval >= 21;\
+        const isLearning = card.reviewCount > 0 && card.interval < 21;\
+\
+        if (selectedStatus === 'due' && !isDue) return false;\
+        if (selectedStatus === 'new' && !isNew) return false;\
+        if (selectedStatus === 'learning' && !isLearning) return false;\
+        if (selectedStatus === 'mastered' && !isMastered) return false;\
+\
+        if (query) \{\
+          const text = `$\{card.front\} $\{card.back\} $\{card.deck || ''\} $\{card.note || ''\}`.toLowerCase();\
+          if (!text.includes(query)) return false;\
+        \}\
+        return true;\
+      \});\
+\
+      container.innerHTML = '';\
+      if (filtered.length === 0) \{\
+        emptyNotice.classList.remove('hidden');\
+        return;\
+      \}\
+      emptyNotice.classList.add('hidden');\
+\
+      filtered.forEach(card => \{\
+        const isDue = isCardDue(card);\
+        let badge = '<span class="px-2 py-0.5 rounded-md text-[10px] font-bold bg-blue-50 text-blue-600 dark:bg-blue-950/50 dark:text-blue-400">\uc0\u26032 \u35215 </span>';\
+        if (card.interval >= 21) \{\
+          badge = '<span class="px-2 py-0.5 rounded-md text-[10px] font-bold bg-emerald-50 text-emerald-600 dark:bg-emerald-950/50 dark:text-emerald-400">\uc0\u32722 \u24471 </span>';\
+        \} else if (card.reviewCount > 0) \{\
+          badge = '<span class="px-2 py-0.5 rounded-md text-[10px] font-bold bg-amber-50 text-amber-600 dark:bg-amber-950/50 dark:text-amber-400">\uc0\u23450 \u30528 \u20013 </span>';\
+        \}\
+\
+        const cardItem = document.createElement('div');\
+        cardItem.className = 'bg-white dark:bg-slate-900 p-3 rounded-2xl border border-slate-200/80 dark:border-slate-800 shadow-xs flex items-center justify-between gap-2';\
+        cardItem.innerHTML = `\
+          <div class="flex-1 min-w-0">\
+            <div class="flex items-center space-x-2">\
+              <span class="font-bold text-xs text-slate-900 dark:text-white truncate">$\{escapeHTML(card.front)\}</span>\
+              $\{badge\}\
+              <span class="text-[10px] text-slate-400 font-mono">\uc0\u38291 \u38548 : $\{card.interval || 0\}\u26085 </span>\
+            </div>\
+            <div class="text-xs text-teal-600 dark:text-teal-400 mt-0.5 truncate">$\{escapeHTML(card.back)\}</div>\
+            <div class="text-[10px] text-slate-400 mt-1 flex items-center space-x-2">\
+              <span class="bg-slate-100 dark:bg-slate-800 px-1.5 py-0.5 rounded">$\{escapeHTML(card.deck || '\uc0\u19968 \u33324 ')\}</span>\
+              $\{isDue ? '<span class="text-red-500 font-bold">\uc0\u35201 \u24489 \u32722 </span>' : ''\}\
+            </div>\
+          </div>\
+          <div class="flex items-center space-x-1 flex-shrink-0">\
+            <button onclick="editCard('$\{card.id\}')" title="\uc0\u32232 \u38598 " class="w-8 h-8 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 active:scale-95 flex items-center justify-center text-xs">\
+              <i class="fa-solid fa-pen"></i>\
+            </button>\
+            <button onclick="deleteCard('$\{card.id\}')" title="\uc0\u21066 \u38500 " class="w-8 h-8 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-400 hover:text-red-500 active:scale-95 flex items-center justify-center text-xs">\
+              <i class="fa-solid fa-trash-can"></i>\
+            </button>\
+          </div>\
+        `;\
+        container.appendChild(cardItem);\
+      \});\
+    \}\
+\
+    function renderStats() \{\
+      const total = cards.length;\
+      const due = cards.filter(isCardDue).length;\
+      const mastered = cards.filter(c => c.interval >= 21).length;\
+      const learning = cards.filter(c => c.reviewCount > 0 && c.interval < 21).length;\
+      const newCards = cards.filter(c => !c.reviewCount || c.reviewCount === 0).length;\
+      const totalReviews = cards.reduce((acc, c) => acc + (c.reviewCount || 0), 0);\
+\
+      document.getElementById('stat-total').innerText = total;\
+      document.getElementById('stat-due').innerText = due;\
+      document.getElementById('stat-mastered').innerText = mastered;\
+      document.getElementById('stat-reviews').innerText = totalReviews;\
+\
+      if (total > 0) \{\
+        const newPct = Math.round((newCards / total) * 100);\
+        const learnPct = Math.round((learning / total) * 100);\
+        const masterPct = Math.round((mastered / total) * 100);\
+\
+        document.getElementById('bar-new').style.width = `$\{newPct\}%`;\
+        document.getElementById('bar-new-pct').innerText = `$\{newCards\}\uc0\u26522  ($\{newPct\}%)`;\
+\
+        document.getElementById('bar-learn').style.width = `$\{learnPct\}%`;\
+        document.getElementById('bar-learn-pct').innerText = `$\{learning\}\uc0\u26522  ($\{learnPct\}%)`;\
+\
+        document.getElementById('bar-master').style.width = `$\{masterPct\}%`;\
+        document.getElementById('bar-master-pct').innerText = `$\{mastered\}\uc0\u26522  ($\{masterPct\}%)`;\
+      \} else \{\
+        document.getElementById('bar-new').style.width = '0%';\
+        document.getElementById('bar-learn').style.width = '0%';\
+        document.getElementById('bar-master').style.width = '0%';\
+      \}\
+    \}\
+\
+    function updateGlobalCounters() \{\
+      const dueCount = cards.filter(isCardDue).length;\
+      const dueEl = document.getElementById('nav-due-count');\
+      const totalEl = document.getElementById('nav-total-count');\
+      if (dueEl) dueEl.innerText = dueCount;\
+      if (totalEl) totalEl.innerText = cards.length;\
+    \}\
+\
+    function updateQueueBadges() \{\
+      const newCount = studyQueue.filter(c => !c.reviewCount || c.reviewCount === 0).length;\
+      const learnCount = studyQueue.filter(c => c.reviewCount > 0 && c.interval < 21).length;\
+      const dueCount = studyQueue.filter(c => c.interval >= 21).length;\
+\
+      const qNew = document.getElementById('queue-new-count');\
+      const qLearn = document.getElementById('queue-learn-count');\
+      const qDue = document.getElementById('queue-due-count');\
+\
+      if (qNew) qNew.innerText = newCount;\
+      if (qLearn) qLearn.innerText = learnCount;\
+      if (qDue) qDue.innerText = dueCount;\
+      updateGlobalCounters();\
+    \}\
+\
+    function openCardModal(cardId = null) \{\
+      const modal = document.getElementById('card-modal');\
+      const box = document.getElementById('card-modal-box');\
+      const title = document.getElementById('modal-title');\
+      const form = document.getElementById('card-form');\
+\
+      form.reset();\
+      document.getElementById('card-edit-id').value = '';\
+      updateDeckDropdowns();\
+\
+      const customInput = document.getElementById('form-deck-custom');\
+      customInput.classList.add('hidden');\
+      customInput.value = '';\
+\
+      if (cardId) \{\
+        const card = cards.find(c => c.id === cardId);\
+        if (card) \{\
+          title.innerText = '\uc0\u21336 \u35486 \u12459 \u12540 \u12489 \u12434 \u32232 \u38598 ';\
+          document.getElementById('card-edit-id').value = card.id;\
+          document.getElementById('form-front').value = card.front;\
+          document.getElementById('form-back').value = card.back;\
+          \
+          const select = document.getElementById('form-deck-select');\
+          if (card.deck && Array.from(select.options).some(o => o.value === card.deck)) \{\
+            select.value = card.deck;\
+          \} else \{\
+            select.value = '__custom__';\
+            customInput.classList.remove('hidden');\
+            customInput.value = card.deck || '';\
+          \}\
+\
+          document.getElementById('form-phonetic').value = card.phonetic || '';\
+          document.getElementById('form-example').value = card.example || '';\
+          document.getElementById('form-example-tr').value = card.exampleTr || '';\
+          document.getElementById('form-note').value = card.note || '';\
+        \}\
+      \} else \{\
+        title.innerText = '\uc0\u21336 \u35486 \u12459 \u12540 \u12489 \u12434 \u36861 \u21152 ';\
+        const select = document.getElementById('form-deck-select');\
+        if (currentStudyDeck && currentStudyDeck !== 'all') \{\
+          select.value = currentStudyDeck;\
+        \}\
+      \}\
+\
+      modal.classList.remove('opacity-0', 'pointer-events-none');\
+      box.classList.remove('bottom-sheet-hidden');\
+      box.classList.add('bottom-sheet-visible');\
+    \}\
+\
+    function closeCardModal() \{\
+      const modal = document.getElementById('card-modal');\
+      const box = document.getElementById('card-modal-box');\
+      box.classList.remove('bottom-sheet-visible');\
+      box.classList.add('bottom-sheet-hidden');\
+      setTimeout(() => \{\
+        modal.classList.add('opacity-0', 'pointer-events-none');\
+      \}, 200);\
+    \}\
+\
+    function onFormDeckChange(val) \{\
+      const customInput = document.getElementById('form-deck-custom');\
+      if (val === '__custom__') \{\
+        customInput.classList.remove('hidden');\
+        customInput.focus();\
+      \} else \{\
+        customInput.classList.add('hidden');\
+      \}\
+    \}\
+\
+    function saveCard(e) \{\
+      e.preventDefault();\
+      const editId = document.getElementById('card-edit-id').value;\
+      const front = document.getElementById('form-front').value.trim();\
+      const back = document.getElementById('form-back').value.trim();\
+      \
+      let deck = document.getElementById('form-deck-select').value;\
+      if (deck === '__custom__') \{\
+        deck = document.getElementById('form-deck-custom').value.trim() || '\uc0\u19968 \u33324 ';\
+        if (!customDecks.includes(deck)) customDecks.push(deck);\
+      \}\
+\
+      const phonetic = document.getElementById('form-phonetic').value.trim();\
+      const example = document.getElementById('form-example').value.trim();\
+      const exampleTr = document.getElementById('form-example-tr').value.trim();\
+      const note = document.getElementById('form-note').value.trim();\
+\
+      if (!front || !back) \{\
+        showToast('\uc0\u34920 \u38754 \u12392 \u35023 \u38754 \u12434 \u20837 \u21147 \u12375 \u12390 \u12367 \u12384 \u12373 \u12356 ', 'error');\
+        return;\
+      \}\
+\
+      if (editId) \{\
+        const idx = cards.findIndex(c => c.id === editId);\
+        if (idx !== -1) \{\
+          cards[idx] = \{ ...cards[idx], front, back, deck, phonetic, example, exampleTr, note \};\
+          showToast('\uc0\u21336 \u35486 \u12434 \u26356 \u26032 \u12375 \u12414 \u12375 \u12383 ', 'success');\
+        \}\
+      \} else \{\
+        const newCard = \{\
+          id: 'card_' + Date.now() + '_' + Math.random().toString(36).substr(2, 5),\
+          front, back, deck, phonetic, example, exampleTr, note,\
+          repetition: 0, interval: 0, easeFactor: 2.5,\
+          nextReview: new Date().toISOString(), lastReview: null, reviewCount: 0\
+        \};\
+        cards.unshift(newCard);\
+        showToast('\uc0\u21336 \u35486 \u12434 \u36861 \u21152 \u12375 \u12414 \u12375 \u12383 ', 'success');\
+      \}\
+\
+      saveToStorage();\
+      closeCardModal();\
+      renderCardsList();\
+      renderDeckTree();\
+      prepareStudySession();\
+    \}\
+\
+    function editCard(id) \{\
+      openCardModal(id);\
+    \}\
+\
+    function deleteCard(id) \{\
+      showConfirmModal('\uc0\u21336 \u35486 \u12398 \u21066 \u38500 ', '\u12371 \u12398 \u21336 \u35486 \u12459 \u12540 \u12489 \u12434 \u21066 \u38500 \u12375 \u12414 \u12377 \u12363 \u65311 ', () => \{\
+        cards = cards.filter(c => c.id !== id);\
+        saveToStorage();\
+        renderCardsList();\
+        renderDeckTree();\
+        prepareStudySession();\
+        showToast('\uc0\u12459 \u12540 \u12489 \u12434 \u21066 \u38500 \u12375 \u12414 \u12375 \u12383 ', 'info');\
+      \});\
+    \}\
+\
+    function openDeckModal() \{\
+      const modal = document.getElementById('deck-modal');\
+      const box = document.getElementById('deck-modal-box');\
+      document.getElementById('deck-modal-title').innerText = '\uc0\u26032 \u35215 \u12487 \u12483 \u12461 \u20316 \u25104 ';\
+      document.getElementById('deck-form').reset();\
+      document.getElementById('deck-edit-original').value = '';\
+      updateDeckDropdowns();\
+\
+      modal.classList.remove('opacity-0', 'pointer-events-none');\
+      box.classList.remove('bottom-sheet-hidden');\
+      box.classList.add('bottom-sheet-visible');\
+    \}\
+\
+    function openSubDeckModal(parentPath) \{\
+      openDeckModal();\
+      document.getElementById('deck-parent-select').value = parentPath;\
+      document.getElementById('deck-name-input').focus();\
+    \}\
+\
+    function openEditDeckModal(deckPath) \{\
+      openDeckModal();\
+      document.getElementById('deck-modal-title').innerText = '\uc0\u12487 \u12483 \u12461 \u21517 \u22793 \u26356 ';\
+      document.getElementById('deck-edit-original').value = deckPath;\
+\
+      const parts = deckPath.split('::');\
+      const name = parts.pop();\
+      const parent = parts.join('::');\
+\
+      document.getElementById('deck-parent-select').value = parent;\
+      document.getElementById('deck-name-input').value = name;\
+    \}\
+\
+    function closeDeckModal() \{\
+      const modal = document.getElementById('deck-modal');\
+      const box = document.getElementById('deck-modal-box');\
+      box.classList.remove('bottom-sheet-visible');\
+      box.classList.add('bottom-sheet-hidden');\
+      setTimeout(() => \{\
+        modal.classList.add('opacity-0', 'pointer-events-none');\
+      \}, 200);\
+    \}\
+\
+    function saveDeck(e) \{\
+      e.preventDefault();\
+      const originalPath = document.getElementById('deck-edit-original').value;\
+      const parent = document.getElementById('deck-parent-select').value.trim();\
+      const name = document.getElementById('deck-name-input').value.trim().replace(/::/g, '-');\
+\
+      if (!name) return;\
+      const newPath = parent ? `$\{parent\}::$\{name\}` : name;\
+\
+      if (originalPath) \{\
+        cards.forEach(c => \{\
+          if (c.deck === originalPath) c.deck = newPath;\
+          else if (c.deck && c.deck.startsWith(originalPath + '::')) \{\
+            c.deck = newPath + c.deck.substring(originalPath.length);\
+          \}\
+        \});\
+        customDecks = customDecks.map(d => \{\
+          if (d === originalPath) return newPath;\
+          if (d.startsWith(originalPath + '::')) return newPath + d.substring(originalPath.length);\
+          return d;\
+        \});\
+        showToast('\uc0\u12487 \u12483 \u12461 \u21517 \u12434 \u26356 \u26032 \u12375 \u12414 \u12375 \u12383 ', 'success');\
+      \} else \{\
+        if (!customDecks.includes(newPath)) customDecks.push(newPath);\
+        showToast('\uc0\u12487 \u12483 \u12461 \u12434 \u20316 \u25104 \u12375 \u12414 \u12375 \u12383 ', 'success');\
+      \}\
+\
+      saveToStorage();\
+      closeDeckModal();\
+      renderDeckTree();\
+    \}\
+\
+    function deleteDeckHierarchy(deckPath) \{\
+      showConfirmModal('\uc0\u12487 \u12483 \u12461 \u12398 \u21066 \u38500 ', `\u12300 $\{deckPath\}\u12301 \u12362 \u12424 \u12403 \u37197 \u19979 \u12398 \u21336 \u35486 \u12434 \u12377 \u12409 \u12390 \u21066 \u38500 \u12375 \u12414 \u12377 \u12363 \u65311 `, () => \{\
+        cards = cards.filter(c => !isCardInDeckHierarchy(c.deck, deckPath));\
+        customDecks = customDecks.filter(d => !isCardInDeckHierarchy(d, deckPath));\
+        saveToStorage();\
+        renderDeckTree();\
+        renderCardsList();\
+        prepareStudySession();\
+        showToast('\uc0\u12487 \u12483 \u12461 \u12434 \u21066 \u38500 \u12375 \u12414 \u12375 \u12383 ', 'info');\
+      \});\
+    \}\
+\
+    function openImportModal(targetDeck = '__from_csv__') \{\
+      const modal = document.getElementById('import-modal');\
+      const box = document.getElementById('import-modal-box');\
+      const select = document.getElementById('import-deck-target-select');\
+      const customInput = document.getElementById('import-deck-custom');\
+\
+      updateDeckDropdowns();\
+\
+      if (targetDeck && targetDeck !== '__from_csv__') \{\
+        select.value = targetDeck;\
+      \} else \{\
+        select.value = '__from_csv__';\
+      \}\
+\
+      customInput.classList.add('hidden');\
+      customInput.value = '';\
+\
+      modal.classList.remove('opacity-0', 'pointer-events-none');\
+      box.classList.remove('bottom-sheet-hidden');\
+      box.classList.add('bottom-sheet-visible');\
+    \}\
+\
+    function closeImportModal() \{\
+      const modal = document.getElementById('import-modal');\
+      const box = document.getElementById('import-modal-box');\
+      box.classList.remove('bottom-sheet-visible');\
+      box.classList.add('bottom-sheet-hidden');\
+      setTimeout(() => \{\
+        modal.classList.add('opacity-0', 'pointer-events-none');\
+      \}, 200);\
+    \}\
+\
+    function onImportDeckSelectChange(val) \{\
+      const customInput = document.getElementById('import-deck-custom');\
+      if (val === '__custom__') \{\
+        customInput.classList.remove('hidden');\
+        customInput.focus();\
+      \} else \{\
+        customInput.classList.add('hidden');\
+      \}\
+    \}\
+\
+    function handleModalFileImport(event) \{\
+      const file = event.target.files[0];\
+      if (!file) return;\
+\
+      const selectVal = document.getElementById('import-deck-target-select').value;\
+      let targetDeckOverride = null;\
+\
+      if (selectVal === '__custom__') \{\
+        targetDeckOverride = document.getElementById('import-deck-custom').value.trim();\
+        if (targetDeckOverride && !customDecks.includes(targetDeckOverride)) \{\
+          customDecks.push(targetDeckOverride);\
+        \}\
+      \} else if (selectVal !== '__from_csv__') \{\
+        targetDeckOverride = selectVal;\
+      \}\
+\
+      const fileName = file.name.toLowerCase();\
+      const reader = new FileReader();\
+\
+      reader.onload = function(e) \{\
+        const content = e.target.result;\
+        try \{\
+          if (fileName.endsWith('.json')) \{\
+            importCardsJSONContent(content, targetDeckOverride);\
+          \} else \{\
+            importCardsCSVContent(content, targetDeckOverride);\
+          \}\
+          closeImportModal();\
+        \} catch (err) \{\
+          showToast('\uc0\u35501 \u36796 \u12456 \u12521 \u12540 : ' + (err.message || ''), 'error');\
+        \}\
+      \};\
+\
+      reader.readAsText(file, 'utf-8');\
+      event.target.value = '';\
+    \}\
+\
+    function parseCSV(text) \{\
+      const rows = [];\
+      let currentRow = [];\
+      let currentVal = '';\
+      let insideQuote = false;\
+\
+      const firstLine = text.split(/\\r\\n|\\r|\\n/)[0] || '';\
+      const delimiter = firstLine.includes('\\t') && !firstLine.includes(',') ? '\\t' : ',';\
+\
+      for (let i = 0; i < text.length; i++) \{\
+        const char = text[i];\
+        const nextChar = text[i + 1];\
+\
+        if (char === '"') \{\
+          if (insideQuote && nextChar === '"') \{\
+            currentVal += '"';\
+            i++;\
+          \} else \{\
+            insideQuote = !insideQuote;\
+          \}\
+        \} else if (char === delimiter && !insideQuote) \{\
+          currentRow.push(currentVal.trim());\
+          currentVal = '';\
+        \} else if ((char === '\\r' || char === '\\n') && !insideQuote) \{\
+          if (char === '\\r' && nextChar === '\\n') i++;\
+          currentRow.push(currentVal.trim());\
+          if (currentRow.some(val => val.length > 0)) rows.push(currentRow);\
+          currentRow = [];\
+          currentVal = '';\
+        \} else \{\
+          currentVal += char;\
+        \}\
+      \}\
+\
+      if (currentVal || currentRow.length > 0) \{\
+        currentRow.push(currentVal.trim());\
+        if (currentRow.some(val => val.length > 0)) rows.push(currentRow);\
+      \}\
+      return rows;\
+    \}\
+\
+    function importCardsCSVContent(content, targetDeckOverride = null) \{\
+      const rows = parseCSV(content);\
+      if (!rows || rows.length === 0) \{\
+        showToast('CSV\uc0\u12487 \u12540 \u12479 \u12364 \u35211 \u12388 \u12363 \u12426 \u12414 \u12379 \u12435 ', 'error');\
+        return;\
+      \}\
+\
+      let startIndex = 0;\
+      const headerKeywords = ['\uc0\u34920 \u38754 ', 'front', '\u21336 \u35486 ', 'word', 'term', 'question', '\u35023 \u38754 ', 'meaning', 'back'];\
+      const firstRowLower = rows[0].map(c => c.toLowerCase());\
+      if (firstRowLower.some(cell => headerKeywords.some(k => cell.includes(k)))) \{\
+        startIndex = 1;\
+      \}\
+\
+      let addedCount = 0;\
+      const nowISO = new Date().toISOString();\
+\
+      for (let i = startIndex; i < rows.length; i++) \{\
+        const row = rows[i];\
+        if (row.length < 2) continue;\
+\
+        const front = row[0] || '';\
+        const back = row[1] || '';\
+        if (!front || !back) continue;\
+\
+        let deck = targetDeckOverride ? targetDeckOverride : (row[2] || '\uc0\u33521 \u35486 ::\u19968 \u33324 ');\
+        const phonetic = row[3] || '';\
+        const example = row[4] || '';\
+        const exampleTr = row[5] || '';\
+        const note = row[6] || '';\
+\
+        const existingIdx = cards.findIndex(c => c.front.trim().toLowerCase() === front.trim().toLowerCase() && c.deck === deck);\
+        \
+        if (existingIdx !== -1) \{\
+          cards[existingIdx] = \{\
+            ...cards[existingIdx],\
+            back,\
+            phonetic: phonetic || cards[existingIdx].phonetic,\
+            example: example || cards[existingIdx].example,\
+            exampleTr: exampleTr || cards[existingIdx].exampleTr,\
+            note: note || cards[existingIdx].note\
+          \};\
+        \} else \{\
+          cards.push(\{\
+            id: 'csv_' + Date.now() + '_' + Math.random().toString(36).substr(2, 6),\
+            front, back, deck, phonetic, example, exampleTr, note,\
+            repetition: 0, interval: 0, easeFactor: 2.5,\
+            nextReview: nowISO, lastReview: null, reviewCount: 0\
+          \});\
+        \}\
+        addedCount++;\
+      \}\
+\
+      if (addedCount > 0) \{\
+        saveToStorage();\
+        renderCardsList();\
+        renderDeckTree();\
+        prepareStudySession();\
+        showToast(`$\{addedCount\}\uc0\u20214 \u12398 \u21336 \u35486 \u12434 \u12452 \u12531 \u12509 \u12540 \u12488 \u12375 \u12414 \u12375 \u12383 `, 'success');\
+      \} else \{\
+        showToast('\uc0\u26377 \u21177 \u12394 \u21336 \u35486 \u12487 \u12540 \u12479 \u12364 \u12354 \u12426 \u12414 \u12379 \u12435 \u12391 \u12375 \u12383 ', 'error');\
+      \}\
+    \}\
+\
+    function importCardsJSONContent(content, targetDeckOverride = null) \{\
+      const imported = JSON.parse(content);\
+      if (Array.isArray(imported)) \{\
+        if (targetDeckOverride) \{\
+          imported.forEach(c => c.deck = targetDeckOverride);\
+        \}\
+        cards = imported;\
+        saveToStorage();\
+        renderCardsList();\
+        renderDeckTree();\
+        prepareStudySession();\
+        showToast(`$\{imported.length\}\uc0\u20214 \u12398 \u21336 \u35486 \u12434 \u24489 \u20803 \u12375 \u12414 \u12375 \u12383 `, 'success');\
+      \} else \{\
+        showToast('\uc0\u28961 \u21177 \u12394 JSON\u12391 \u12377 ', 'error');\
+      \}\
+    \}\
+\
+    function exportCardsJSON() \{\
+      const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(cards, null, 2));\
+      const downloadAnchor = document.createElement('a');\
+      downloadAnchor.setAttribute("href", dataStr);\
+      downloadAnchor.setAttribute("download", `FlashSRS_backup_$\{new Date().toISOString().slice(0,10)\}.json`);\
+      document.body.appendChild(downloadAnchor);\
+      downloadAnchor.click();\
+      downloadAnchor.remove();\
+      showToast('\uc0\u21336 \u35486 \u12487 \u12540 \u12479 \u12434 \u12456 \u12463 \u12473 \u12509 \u12540 \u12488 \u12375 \u12414 \u12375 \u12383 ', 'success');\
+    \}\
+\
+    function downloadCSVTemplate() \{\
+      const sampleCSV = `\uc0\u34920 \u38754 (\u24517 \u38920 ),\u35023 \u38754 (\u24517 \u38920 ),\u12487 \u12483 \u12461 \u21517 (\u38542 \u23652 \u12399 ::),\u30330 \u38899 \u35352 \u21495 ,\u20363 \u25991 ,\u20363 \u25991 \u26085 \u26412 \u35486 \u35379 ,\u12513 \u12514 \
+ubiquitous,\uc0\u12393 \u12371 \u12395 \u12391 \u12418 \u12354 \u12427 \u12539 \u20559 \u22312 \u12377 \u12427 ,\u33521 \u35486 ::TOEIC\u24517 \u20462 ,/ju\u720 \u712 b\u618 kw\u618 t\u601 s/,Smartphones are ubiquitous.,\u12473 \u12510 \u12507 \u12399 \u12393 \u12371 \u12395 \u12391 \u12418 \u12354 \u12427 \u12290 ,\
+pragmatic,\uc0\u23455 \u36341 \u30340 \u12394 \u12539 \u23455 \u29992 \u20027 \u32681 \u12398 ,\u33521 \u35486 ::\u12499 \u12472 \u12493 \u12473 ::\u20132 \u28169 ,/pr\'e6\u609 \u712 m\'e6t\u618 k/,We need a pragmatic solution.,\u29694 \u23455 \u30340 \u12394 \u35299 \u27770 \u31574 \u12364 \u24517 \u35201 \u12384 \u12290 ,`;\
+\
+      const bom = new Uint8Array([0xEF, 0xBB, 0xBF]);\
+      const blob = new Blob([bom, sampleCSV], \{ type: 'text/csv;charset=utf-8;' \});\
+      const url = URL.createObjectURL(blob);\
+      const a = document.createElement('a');\
+      a.href = url;\
+      a.download = 'FlashSRS_\uc0\u21336 \u35486 \u12452 \u12531 \u12509 \u12540 \u12488 \u38619 \u24418 .csv';\
+      document.body.appendChild(a);\
+      a.click();\
+      document.body.removeChild(a);\
+      URL.revokeObjectURL(url);\
+      showToast('CSV\uc0\u38619 \u24418 \u12434 \u12480 \u12454 \u12531 \u12525 \u12540 \u12489 \u12375 \u12414 \u12375 \u12383 ', 'info');\
+    \}\
+\
+    function loadDefaultPresets() \{\
+      DEFAULT_PRESET_CARDS.forEach(p => \{\
+        if (!cards.some(c => c.front === p.front && c.deck === p.deck)) \{\
+          cards.push(\{ ...p, id: 'preset_' + Date.now() + '_' + Math.random().toString(36).substr(2, 4) \});\
+        \}\
+      \});\
+      saveToStorage();\
+      prepareStudySession();\
+      renderCardsList();\
+      renderDeckTree();\
+      showToast('\uc0\u12503 \u12522 \u12475 \u12483 \u12488 \u21336 \u35486 \u12434 \u12525 \u12540 \u12489 \u12375 \u12414 \u12375 \u12383 ', 'success');\
+    \}\
+\
+    function clearAllDataModal() \{\
+      showConfirmModal('\uc0\u20840 \u12487 \u12540 \u12479 \u21021 \u26399 \u21270 ', '\u21336 \u35486 \u12392 \u23398 \u32722 \u23653 \u27508 \u12364 \u28040 \u21435 \u12373 \u12428 \u12414 \u12377 \u12290 \u12424 \u12429 \u12375 \u12356 \u12391 \u12377 \u12363 \u65311 ', () => \{\
+        cards = [];\
+        customDecks = [];\
+        dailyStats = \{\
+          date: new Date().toISOString().slice(0, 10),\
+          newCount: 0,\
+          dueCount: 0\
+        \};\
+        saveToStorage();\
+        saveDailyStats();\
+        prepareStudySession();\
+        renderCardsList();\
+        renderDeckTree();\
+        renderStats();\
+        showToast('\uc0\u20840 \u12487 \u12540 \u12479 \u12434 \u12522 \u12475 \u12483 \u12488 \u12375 \u12414 \u12375 \u12383 ', 'info');\
+      \});\
+    \}\
+\
+    function showConfirmModal(title, message, onConfirm) \{\
+      const modal = document.getElementById('confirm-modal');\
+      document.getElementById('confirm-title').innerText = title;\
+      document.getElementById('confirm-msg').innerText = message;\
+      \
+      const btnCancel = document.getElementById('confirm-btn-cancel');\
+      const btnOk = document.getElementById('confirm-btn-ok');\
+\
+      const close = () => \{\
+        modal.classList.add('opacity-0', 'pointer-events-none');\
+      \};\
+\
+      btnCancel.onclick = close;\
+      btnOk.onclick = () => \{\
+        close();\
+        if (onConfirm) onConfirm();\
+      \};\
+\
+      modal.classList.remove('opacity-0', 'pointer-events-none');\
+    \}\
+\
+    function showToast(msg, type = 'info') \{\
+      const container = document.getElementById('toast-container');\
+      const toast = document.createElement('div');\
+      \
+      let bg = 'bg-slate-900 text-white';\
+      let icon = 'fa-circle-info text-teal-400';\
+      if (type === 'success') \{\
+        bg = 'bg-emerald-600 text-white';\
+        icon = 'fa-circle-check';\
+      \} else if (type === 'error') \{\
+        bg = 'bg-red-600 text-white';\
+        icon = 'fa-circle-exclamation';\
+      \}\
+\
+      toast.className = `$\{bg\} pointer-events-auto px-4 py-2 rounded-2xl shadow-xl flex items-center space-x-2 text-xs font-semibold transform transition-all duration-200 translate-y-2 opacity-0 max-w-sm`;\
+      toast.innerHTML = `<i class="fa-solid $\{icon\}"></i><span>$\{escapeHTML(msg)\}</span>`;\
+\
+      container.appendChild(toast);\
+      \
+      requestAnimationFrame(() => \{\
+        toast.classList.remove('translate-y-2', 'opacity-0');\
+      \});\
+\
+      setTimeout(() => \{\
+        toast.classList.add('opacity-0', 'translate-y-2');\
+        setTimeout(() => toast.remove(), 250);\
+      \}, 2300);\
+    \}\
+\
+    function toggleDarkMode() \{\
+      const html = document.documentElement;\
+      const isDark = html.classList.toggle('dark');\
+      localStorage.setItem('flashsrs_theme', isDark ? 'dark' : 'light');\
+      document.getElementById('theme-icon').className = isDark ? 'fa-solid fa-sun text-xs' : 'fa-solid fa-moon text-xs';\
+    \}\
+\
+    function escapeHTML(str) \{\
+      if (!str) return '';\
+      return String(str).replace(/[&<>'"]/g, \
+        tag => (\{\
+          '&': '&amp;',\
+          '<': '&lt;',\
+          '>': '&gt;',\
+          "'": '&#39;',\
+          '"': '&quot;'\
+        \}[tag] || tag)\
+      );\
+    \}\
+\
+    window.onload = initApp;\
+  </script>\
+</body>\
+</html>}
